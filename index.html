@@ -1,0 +1,2772 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Feliz cumpleaños, Fer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet" crossorigin="anonymous">
+<style>
+  /* ============ TOKENS ============ */
+  :root{
+    --bg-deep:#0b0e1a;
+    --bg-deep-2:#141a30;
+    --gold:#e8b75d;
+    --gold-soft:#f3d9a4;
+    --rose:#7a3b4e;
+    --rose-dark:#5c2c3c;
+    --paper:#fbf3e3;
+    --paper-shadow:#e9dcc0;
+    --ink:#3b2a21;
+    --blush:#f3b9c9;
+    --teal:#8fd6c9;
+    --envelope-white:#efe6d2;
+    --envelope-shade:#ddd0ae;
+    --envelope-line:rgba(120,95,55,.4);
+    --twine:#a9895f;
+    --red:#a5231c;
+    --red-dark:#6e1912;
+    --ui-font:'Poppins',sans-serif;
+    --script-font:'Great Vibes',cursive;
+    --serif-font:'Cormorant Garamond',serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;padding:0;height:100%;
+    background:var(--bg-deep);
+    color:var(--paper);
+    font-family:var(--ui-font);
+    overflow:hidden;
+    -webkit-tap-highlight-color:transparent;
+  }
+
+  #app{position:relative;width:100%;height:100dvh;overflow:hidden;}
+
+  /* ============ STARFIELD (persistent) ============ */
+  #stars-layer{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+  }
+  #stars-layer span{
+    position:absolute;background:#fff;border-radius:50%;
+    opacity:.6;animation:twinkle 3.5s ease-in-out infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:.15;}
+    50%{opacity:.9;}
+  }
+
+  .heart-particle{
+    position:fixed;bottom:-5%;z-index:1;pointer-events:none;
+    color:var(--blush);opacity:.85;font-size:1.1rem;
+    animation:rise linear forwards;
+  }
+  @keyframes rise{
+    0%{transform:translateY(0) translateX(0) rotate(0deg);opacity:0;}
+    10%{opacity:.9;}
+    100%{transform:translateY(-110vh) translateX(var(--drift,20px)) rotate(25deg);opacity:0;}
+  }
+
+  .tap-heart{
+    position:fixed;z-index:8;pointer-events:none;
+    color:var(--blush);font-size:1.1rem;
+    animation:tapHeartPop .8s ease forwards;
+  }
+  @keyframes tapHeartPop{
+    0%{transform:translate(-50%,-50%) scale(.4);opacity:.9;}
+    100%{transform:translate(-50%,-150%) scale(1.15);opacity:0;}
+  }
+
+  /* ---- amanecer al llegar a la última página ---- */
+  #dawn-overlay{
+    position:fixed;inset:0;z-index:0;pointer-events:none;
+    opacity:0;transition:opacity 3s ease;
+    background:linear-gradient(180deg,
+      #ff9a76 0%, #ffb37a 22%, #ffd89a 42%, #7a5677 68%, #201730 100%);
+  }
+  #dawn-overlay.active{opacity:1;}
+
+  .sunrise-scene{
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    min-height:44vh;text-align:center;
+  }
+  .sun{
+    position:relative;
+    width:clamp(70px,22vw,110px);aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6d8, #ffcf6b 45%, #ff9a4d 85%);
+    margin-bottom:1.5rem;
+    animation:sunRise 1.7s cubic-bezier(.22,1,.36,1);
+  }
+  .sun::before{
+    content:"";
+    position:absolute;
+    inset:-90%;
+    border-radius:50%;
+    background:radial-gradient(circle,
+      rgba(255,196,120,.55) 0%,
+      rgba(255,176,100,.32) 30%,
+      rgba(255,160,100,.14) 55%,
+      rgba(255,160,100,0) 75%);
+    z-index:-1;
+  }
+  @keyframes sunRise{
+    0%{transform:translateY(70px) scale(.55);opacity:0;}
+    100%{transform:translateY(0) scale(1);opacity:1;}
+  }
+  .sunrise-scene h2{margin-bottom:.6rem;}
+  .sunrise-scene p{text-align:center;font-size:clamp(1.05rem,3.2vw,1.3rem);max-width:26ch;}
+  .cats-heart{width:min(65%,170px);height:auto;margin-top:1.4rem;opacity:.95;display:block;margin-left:auto;margin-right:auto;}
+
+  /* ============ MUSIC TOGGLE ============ */
+  .music-toggle{
+    position:fixed;top:14px;right:14px;z-index:50;
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.28);
+    color:var(--gold-soft);font-size:1.05rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(4px);
+    transition:background .25s ease, transform .2s ease;
+  }
+  .music-toggle.playing{background:rgba(232,183,93,.28);}
+  .music-toggle:active{transform:scale(.92);}
+
+  .quiet-toggle{
+    position:fixed;top:14px;right:64px;z-index:50;
+    width:42px;height:42px;border-radius:50%;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.28);
+    color:var(--gold-soft);font-size:1.05rem;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    backdrop-filter:blur(4px);
+    transition:background .25s ease, transform .2s ease;
+  }
+  .quiet-toggle.on{background:rgba(232,183,93,.28);}
+  .quiet-toggle:active{transform:scale(.92);}
+  /* modo tranquilo: apaga animaciones ambientales */
+  body.quiet-mode .heart-particle,
+  body.quiet-mode .tap-heart,
+  body.quiet-mode .streamer{display:none !important;}
+  body.quiet-mode #stars-layer span{animation:none !important;}
+
+  /* ============ SCREENS ============ */
+  .screen{
+    position:absolute;inset:0;z-index:2;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:6vh 6vw;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity 1s ease;
+    overflow-y:auto;
+  }
+  .screen.active{opacity:1;visibility:visible;pointer-events:auto;}
+
+  @keyframes pageFade{
+    from{opacity:0;transform:translateY(6px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+
+  /* ---- Intro screen ---- */
+  #screen-intro .hint{
+    font-family:var(--ui-font);font-weight:300;letter-spacing:.12em;
+    text-transform:uppercase;font-size:clamp(.7rem,2.4vw,.9rem);
+    color:var(--gold-soft);margin-top:1.4rem;
+    animation:pulse 2.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(1);opacity:.7;}
+    50%{transform:scale(1.05);opacity:1;}
+  }
+  .charge-star{
+    position:relative;
+    width:clamp(120px,32vw,170px);
+    aspect-ratio:1;
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;
+    -webkit-user-select:none;user-select:none;
+  }
+  .star-icon{
+    display:inline-block;
+    font-size:clamp(2.4rem,9vw,3.4rem);
+    color:var(--gold-soft);
+    pointer-events:none;
+    transform-origin:50% 55%;
+  }
+  .charge-star.igniting .star-icon{
+    animation:ignite 1.7s cubic-bezier(.55,0,1,.45) forwards;
+  }
+  @keyframes ignite{
+    0%  {transform:scale(1)     rotate(0deg)   translate(0,0);   filter:drop-shadow(0 0 4px rgba(232,183,93,.4));}
+    12% {transform:scale(1.02)  rotate(-2deg)  translate(-1px,0);}
+    24% {transform:scale(1.04)  rotate(2deg)   translate(1px,0);}
+    36% {transform:scale(1.07)  rotate(-3deg)  translate(-2px,1px);  filter:drop-shadow(0 0 8px rgba(232,183,93,.55));}
+    48% {transform:scale(1.11)  rotate(4deg)   translate(2px,-1px);}
+    58% {transform:scale(1.16)  rotate(-5deg)  translate(-3px,1px);  filter:drop-shadow(0 0 12px rgba(232,183,93,.65));}
+    68% {transform:scale(1.22)  rotate(6deg)   translate(3px,-2px);}
+    77% {transform:scale(1.29)  rotate(-8deg)  translate(-4px,2px);  filter:drop-shadow(0 0 18px rgba(232,183,93,.8));}
+    85% {transform:scale(1.37)  rotate(9deg)   translate(4px,-3px);}
+    92% {transform:scale(1.47)  rotate(-11deg) translate(-5px,3px);  filter:drop-shadow(0 0 24px rgba(255,220,150,.9));}
+    100%{transform:scale(1.6)   rotate(12deg)  translate(5px,-4px); filter:drop-shadow(0 0 30px rgba(255,220,150,1));}
+  }
+  .charge-star.exploded .star-icon{
+    animation:starBurst .5s ease forwards;
+  }
+  @keyframes starBurst{
+    0%{transform:scale(1.6);opacity:1;}
+    100%{transform:scale(3);opacity:0;}
+  }
+  .charge-star.exploded{pointer-events:none;}
+
+  /* ---- pantalla de bloqueo (cuenta regresiva hasta la hora de desbloqueo) ---- */
+  #lock-screen{
+    position:fixed;inset:0;z-index:999;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:6vh 6vw;
+    background:rgba(4,4,7,.97);
+    backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+    transition:opacity 1.1s ease;
+  }
+  #lock-screen.unlocking{opacity:0;pointer-events:none;}
+  .lock-icon{
+    width:clamp(56px,16vw,78px);height:auto;
+    color:#d8d8dc;
+    margin-bottom:2.4rem;
+    filter:drop-shadow(0 4px 14px rgba(0,0,0,.5));
+    animation:lockPulse 2.4s ease-in-out infinite;
+  }
+  @keyframes lockPulse{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.05);}
+  }
+  .lock-icon.urgent{animation:lockShake .5s ease-in-out infinite;}
+  @keyframes lockShake{
+    0%,100%{transform:rotate(0deg) scale(1.06);}
+    25%{transform:rotate(-7deg) scale(1.06);}
+    75%{transform:rotate(7deg) scale(1.06);}
+  }
+  .lock-label{
+    font-family:var(--ui-font);font-weight:400;font-size:clamp(.85rem,3vw,1rem);
+    letter-spacing:.28em;text-transform:uppercase;
+    color:#8a8a92;margin:0 0 2.2rem;
+  }
+  .lock-countdown{display:flex;gap:clamp(1.4rem,6vw,2.6rem);}
+  .lock-countdown .unit{display:flex;flex-direction:column;align-items:center;}
+  .lock-countdown .num{
+    font-family:var(--ui-font);font-weight:600;
+    font-size:clamp(2.1rem,9vw,3rem);color:#fff;
+    min-width:1.6ch;font-variant-numeric:tabular-nums;line-height:1;
+  }
+  .lock-countdown .lbl{
+    font-family:var(--ui-font);font-size:.68rem;letter-spacing:.14em;
+    text-transform:uppercase;color:#8a8a92;margin-top:.6rem;
+  }
+
+  #flash-overlay{
+    position:fixed;inset:0;z-index:6;pointer-events:none;
+    background:radial-gradient(circle at center, rgba(255,241,214,.95), rgba(255,241,214,0) 62%);
+    opacity:0;
+  }
+  #flash-overlay.active{
+    animation:flashPop .55s ease forwards;
+  }
+  @keyframes flashPop{
+    0%{opacity:0;}
+    15%{opacity:1;}
+    100%{opacity:0;}
+  }
+
+  .streamer{
+    position:fixed;top:0;left:0;z-index:6;pointer-events:none;
+    border-radius:2px;
+    animation:streamerFly ease-out forwards;
+  }
+  @keyframes streamerFly{
+    0%{transform:translate(0,0) rotate(0deg);opacity:1;}
+    70%{opacity:1;}
+    100%{transform:translate(var(--tx),var(--ty)) rotate(var(--rot));opacity:0;}
+  }
+
+  /* ---- hidden star + secret letter ---- */
+  #hidden-star{
+    position:fixed;z-index:3;pointer-events:auto;cursor:pointer;
+    width:22px;height:22px;transform:translate(-50%,-50%);
+    background:transparent;border:none;padding:0;
+  }
+  #hidden-star::before{
+    content:"✦";
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.85rem;color:#fff;
+    opacity:.55;
+    animation:hiddenTwinkle 2.6s ease-in-out infinite;
+  }
+  @keyframes hiddenTwinkle{
+    0%,100%{opacity:.35;transform:scale(1);}
+    50%{opacity:.85;transform:scale(1.25);}
+  }
+  #hidden-star.found::before{display:none;}
+
+  /* ---- estrella fugaz ---- */
+  .shooting-star{
+    position:fixed;top:0;left:0;z-index:6;
+    width:16px;height:16px;pointer-events:auto;cursor:pointer;
+    transform:translate(-50%,-50%);
+    animation:shootFly var(--shoot-dur,1.3s) linear forwards;
+  }
+  .shooting-star::before{
+    content:"";position:absolute;top:50%;left:50%;
+    width:3px;height:3px;border-radius:50%;
+    background:#fff;box-shadow:0 0 8px 2px rgba(255,255,255,.95);
+    transform:translate(-50%,-50%);
+  }
+  .shooting-star::after{
+    content:"";position:absolute;top:50%;left:50%;
+    width:70px;height:2px;
+    background:linear-gradient(90deg, rgba(255,255,255,.85), transparent);
+    transform:translate(-100%,-50%) rotate(var(--shoot-angle,25deg));
+    transform-origin:right center;
+  }
+  @keyframes shootFly{
+    0%{transform:translate(-50%,-50%) translate(0,0);opacity:0;}
+    8%{opacity:1;}
+    85%{opacity:1;}
+    100%{transform:translate(-50%,-50%) translate(var(--shoot-tx), var(--shoot-ty));opacity:0;}
+  }
+
+  #wish-toast{
+    position:fixed;left:50%;bottom:9%;transform:translateX(-50%) translateY(12px);
+    z-index:65;max-width:min(86vw,340px);text-align:center;
+    background:rgba(10,8,20,.85);color:#fff;
+    padding:1rem 1.4rem;border-radius:14px;
+    box-shadow:0 12px 30px rgba(0,0,0,.4);
+    opacity:0;pointer-events:none;
+    transition:opacity .4s ease, transform .4s ease;
+  }
+  #wish-toast.active{opacity:1;transform:translateX(-50%) translateY(0);}
+  #wish-toast p{
+    font-family:var(--serif-font);font-style:italic;font-size:1rem;margin:0;
+  }
+
+  #secret-overlay,
+  #prediction-overlay{
+    position:fixed;inset:0;z-index:60;
+    background:rgba(0,0,0,.6);
+    display:flex;align-items:center;justify-content:center;
+    padding:6vh 5vw;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .4s ease;
+  }
+  #secret-overlay.active,
+  #prediction-overlay.active{opacity:1;visibility:visible;pointer-events:auto;}
+  .secret-card{
+    position:relative;
+    background:var(--paper);color:var(--ink);
+    border-radius:8px;max-width:min(90vw,420px);max-height:80dvh;overflow-y:auto;
+    padding:2.2rem 1.8rem 1.8rem;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+    transform:scale(.92);transition:transform .4s cubic-bezier(.22,1,.36,1);
+    text-align:center;
+  }
+  #secret-overlay.active .secret-card,
+  #prediction-overlay.active .secret-card{transform:scale(1);}
+  .secret-card h2{
+    font-family:var(--script-font);font-weight:400;color:var(--rose-dark);
+    font-size:2rem;text-align:center;margin:0 0 1rem;
+  }
+  .secret-card p{
+    font-family:var(--serif-font);font-size:1.1rem;line-height:1.7;
+    margin:0 0 1rem;
+  }
+  #close-secret,
+  #close-prediction{
+    position:absolute;top:.7rem;right:.9rem;
+    background:none;border:none;font-size:1.2rem;color:var(--rose-dark);
+    cursor:pointer;
+  }
+
+  /* ---- fotos secretas ocultas (dentro de la estrella escondida) ---- */
+  .secret-photos{margin-top:1.2rem;}
+  .secret-photos-stack{
+    position:relative;
+    width:min(78vw,240px);height:min(78vw,240px);
+    margin:0 auto;
+    -webkit-user-select:none;user-select:none;
+  }
+  .secret-photo{
+    position:absolute;inset:0;
+    width:100%;height:100%;
+    object-fit:cover;border-radius:14px;
+    box-shadow:0 10px 26px rgba(0,0,0,.35);
+    filter:blur(22px);
+    transition:filter .5s ease, transform .5s cubic-bezier(.22,1,.36,1), opacity .5s ease;
+    cursor:pointer;
+  }
+  .secret-photos-stack.revealed .secret-photo{filter:none;}
+  .secret-photo.leaving{
+    transform:translateX(115%) rotate(14deg) scale(.9);
+    opacity:0;
+  }
+  .secret-photo.no-transition{transition:none !important;}
+  .secret-photos-veil{
+    position:absolute;inset:0;z-index:20;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(20,10,15,.42);border-radius:14px;
+    cursor:pointer;
+    transition:opacity .5s ease;
+  }
+  .secret-photos-veil span{
+    font-family:var(--script-font);font-size:1.7rem;color:var(--paper);
+    text-shadow:0 2px 10px rgba(0,0,0,.6);
+  }
+  .secret-photos-veil.hidden{
+    opacity:0;pointer-events:none;
+  }
+  .secret-photos-hint{
+    font-family:var(--ui-font);font-size:.72rem;color:var(--ink);
+    opacity:.65;margin:.7rem 0 0;
+  }
+  #secret-photos-download{margin-top:.9rem;}
+
+  /* ---- vista previa de imagen generada (guardar / wallpaper) ---- */
+  #image-preview-overlay{
+    position:fixed;inset:0;z-index:70;
+    background:rgba(0,0,0,.82);
+    display:flex;align-items:center;justify-content:center;
+    padding:6vh 5vw;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .35s ease;
+  }
+  #image-preview-overlay.active{opacity:1;visibility:visible;pointer-events:auto;}
+  .image-preview-card{
+    position:relative;max-width:min(92vw,420px);text-align:center;
+  }
+  #image-preview-img{
+    max-width:100%;max-height:60dvh;border-radius:8px;
+    box-shadow:0 16px 40px rgba(0,0,0,.5);
+    -webkit-touch-callout:default;
+  }
+  .image-preview-hint{
+    color:#fff;opacity:.8;font-family:var(--ui-font);
+    font-size:.78rem;margin:1rem 0 .8rem;
+  }
+  #image-preview-close{
+    position:absolute;top:-2.2rem;right:0;
+    background:none;border:none;font-size:1.3rem;color:#fff;
+    cursor:pointer;opacity:.85;
+  }
+  #image-preview-download{background:#fff;}
+
+  /* ---- wallpaper template (offscreen, used only for capture) ---- */
+  .wallpaper-template{
+    position:fixed;left:-9999px;top:0;
+    width:390px;height:844px;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:2.4rem;box-sizing:border-box;overflow:hidden;
+  }
+  .wallpaper-template.bg-sunrise{
+    background:var(--paper);
+  }
+  .wallpaper-template.bg-stars{
+    background:linear-gradient(180deg,var(--bg-deep-2),var(--bg-deep));
+  }
+  .wallpaper-template.capturing{
+    left:50%;top:50%;transform:translate(-50%,-50%);
+    z-index:80;box-shadow:0 20px 60px rgba(0,0,0,.6);
+  }
+  .wp-stars-layer{position:absolute;inset:0;}
+  .wp-stars-layer span{position:absolute;background:#fff;border-radius:50%;}
+  .wp-sun{
+    position:relative;
+    width:92px;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff6d8, #ffcf6b 45%, #ff9a4d 85%);
+    margin-bottom:1.6rem;
+  }
+  .wp-sun::before{
+    content:"";position:absolute;inset:-90%;border-radius:50%;
+    background:radial-gradient(circle,
+      rgba(255,196,120,.55) 0%, rgba(255,176,100,.32) 30%,
+      rgba(255,160,100,.14) 55%, rgba(255,160,100,0) 75%);
+    z-index:-1;
+  }
+  .wp-content{position:relative;z-index:1;}
+  .wp-title{
+    font-family:var(--script-font);font-weight:400;
+    font-size:2.5rem;color:var(--rose-dark);margin:0 0 1rem;
+  }
+  .wp-name{
+    font-family:var(--script-font);font-weight:400;
+    font-size:2.6rem;color:#fff8ec;margin:0 0 1.1rem;
+    text-shadow:0 2px 10px rgba(0,0,0,.25);
+  }
+  .wp-quote{
+    font-family:var(--serif-font);font-style:italic;
+    font-size:1.1rem;line-height:1.6;color:#fff8ec;
+    max-width:280px;margin:0 auto 1.6rem;
+    text-shadow:0 1px 6px rgba(0,0,0,.2);
+  }
+  .wp-quote.dark{color:var(--ink);text-shadow:none;}
+  .wp-cats-img{width:150px;height:auto;margin-top:.4rem;}
+  .wp-collage{
+    display:grid;grid-template-columns:1fr 1fr;gap:10px;
+    width:230px;margin:0 auto;
+  }
+  .wp-collage img{
+    width:100%;aspect-ratio:1;object-fit:cover;
+    border:4px solid #fff;border-radius:2px;
+    box-shadow:0 6px 14px rgba(0,0,0,.3);
+  }
+  .wp-collage img:nth-child(1){transform:rotate(-4deg);}
+  .wp-collage img:nth-child(2){transform:rotate(3deg);}
+  .wp-collage img:nth-child(3){transform:rotate(2deg);}
+  .wp-collage img:nth-child(4){transform:rotate(-3deg);}
+
+  /* ---- Greeting screen ---- */
+  #screen-greeting h1{
+    font-family:var(--script-font);
+    font-weight:400;
+    font-size:clamp(2.4rem,9.5vw,4.8rem);
+    color:var(--gold-soft);
+    margin:0 0 .2rem 0;
+    text-shadow:0 0 24px rgba(232,183,93,.35);
+    opacity:0;
+    transform:translateY(14px) scale(.96);
+  }
+  #screen-greeting.active h1{
+    animation:appear 1.4s cubic-bezier(.22,1,.36,1) .2s forwards;
+  }
+  @keyframes appear{
+    to{opacity:1;transform:translateY(0) scale(1);}
+  }
+  .heart-icon{
+    display:inline-block;color:var(--red);
+    font-size:.7em;vertical-align:middle;
+    animation:heartbeat 1.8s ease-in-out infinite;
+  }
+  @keyframes heartbeat{
+    0%,100%{transform:scale(1);}
+    50%{transform:scale(1.18);}
+  }
+  #screen-greeting p.sub{
+    font-family:var(--serif-font);font-style:italic;font-size:clamp(1rem,3vw,1.3rem);
+    color:var(--paper);opacity:0;max-width:32ch;
+    margin:0 0 .5rem 0;
+  }
+  #screen-greeting.active p.sub{
+    animation:fadeIn 1.4s ease .9s forwards;
+  }
+  @keyframes fadeIn{to{opacity:.85;}}
+  #screen-greeting p.anniv{
+    font-family:var(--ui-font);font-weight:300;letter-spacing:.08em;
+    text-transform:uppercase;font-size:.72rem;color:var(--gold-soft);
+    opacity:0;margin:0 0 2.6rem 0;
+  }
+  #screen-greeting.active p.anniv{
+    animation:fadeIn 1.2s ease 1.15s forwards;
+  }
+
+  /* ---- Envelope ---- */
+  .envelope-wrap{
+    position:relative;
+    opacity:0;
+    animation:fadeIn 1.2s ease 1.3s forwards;
+  }
+  #envelope{
+    position:relative;
+    width:min(78vw,300px);
+    aspect-ratio:3/2;
+    cursor:pointer;
+    perspective:800px;
+  }
+  #envelope .back{
+    position:absolute;inset:0;
+    background:linear-gradient(160deg,var(--envelope-white),var(--envelope-shade));
+    border-radius:8px;
+    box-shadow:0 14px 34px rgba(0,0,0,.45);
+  }
+  #envelope .flap{
+    position:absolute;top:0;left:0;right:0;height:55%;
+    background:linear-gradient(200deg,#f5efdf,var(--envelope-shade));
+    clip-path:polygon(0 0,100% 0,50% 82%);
+    transform-origin:top center;
+    transform-style:preserve-3d;
+    backface-visibility:hidden;
+    transition:transform 1s cubic-bezier(.6,.05,.3,1);
+    z-index:6;
+    border-radius:8px 8px 0 0;
+    box-shadow:0 1px 0 var(--envelope-line);
+  }
+  #envelope.open .flap{transform:rotateX(180deg);}
+  .seal-group{
+    position:absolute;top:45%;left:50%;
+    transform:translate(-50%,-50%);
+    z-index:10;
+    cursor:pointer;
+  }
+  .twine{
+    position:absolute;top:6%;left:50%;width:1px;height:1px;
+  }
+  .twine::before,
+  .twine::after{
+    content:"";position:absolute;top:0;left:0;
+    width:2px;height:2.6em;background:var(--twine);border-radius:2px;
+    transform-origin:top center;
+    opacity:.8;
+  }
+  .twine::before{transform:translateX(-.35em) rotate(16deg);}
+  .twine::after{transform:translateX(.35em) rotate(-16deg);}
+  .seal{
+    position:relative;
+    width:clamp(46px,13vw,64px);aspect-ratio:1;
+    background:radial-gradient(circle at 32% 28%,#d24b3d,var(--red) 45%,#7a1a14 88%,#5c130f 100%);
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    font-family:var(--script-font);
+    font-size:clamp(1.5rem,4.2vw,2rem);
+    color:rgba(255,255,255,.9);
+    text-shadow:0 1px 1px rgba(0,0,0,.35);
+    box-shadow:
+      0 4px 10px rgba(0,0,0,.4),
+      inset 0 -4px 7px rgba(0,0,0,.35),
+      inset 0 3px 5px rgba(255,255,255,.22);
+    transition:opacity .3s ease;
+  }
+  .seal-group.pulled{
+    animation:pullSeal .7s cubic-bezier(.3,.55,.35,1) forwards;
+  }
+  @keyframes pullSeal{
+    0%{transform:translate(-50%,-50%) rotate(0deg) scale(1);opacity:1;}
+    100%{transform:translate(-50%,-220%) rotate(-38deg) scale(.4);opacity:0;}
+  }
+  #envelope .letter-peek{
+    position:absolute;left:6%;right:6%;bottom:8%;
+    height:0%;
+    background:var(--paper);
+    border-radius:4px;
+    box-shadow:0 6px 16px rgba(0,0,0,.3);
+    z-index:2;
+    transition:height 1s ease .35s, transform 1s cubic-bezier(.2,.8,.3,1) .35s, opacity .6s ease .9s;
+  }
+  #envelope.open .letter-peek{
+    height:78%;
+    transform:translateY(-46%) scale(1.06);
+  }
+  #envelope.rise .letter-peek{opacity:0;}
+  #envelope .tap-label{
+    position:absolute;bottom:-2.4rem;left:0;right:0;
+    font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--gold-soft);font-weight:300;
+  }
+
+  /* ---- Letter screen (book) ---- */
+  #screen-letter{padding:5vh 4vw;}
+  .letter-card{
+    position:relative;
+    width:min(92vw,560px);
+    max-height:88dvh;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:6px;
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+    padding:clamp(1.6rem,5vw,2.6rem) clamp(1.4rem,6vw,2.8rem) 1.4rem;
+    display:flex;flex-direction:column;
+    transform:translateY(24px) scale(.97);
+    opacity:0;
+    transition:opacity .8s ease, transform .8s cubic-bezier(.22,1,.36,1);
+  }
+  #screen-letter.active .letter-card{
+    opacity:1;transform:translateY(0) scale(1);
+  }
+  .reading-progress{
+    height:3px;width:100%;background:var(--paper-shadow);
+    border-radius:3px;overflow:hidden;flex-shrink:0;
+    margin-bottom:.9rem;
+  }
+  .reading-progress-fill{
+    height:100%;width:0%;background:var(--gold);
+    border-radius:3px;transition:width .5s cubic-bezier(.22,1,.36,1);
+  }
+  #close-letter{
+    position:absolute;top:.8rem;right:1rem;
+    background:none;border:none;cursor:pointer;
+    font-family:var(--ui-font);font-size:1.3rem;color:var(--rose-dark);
+    line-height:1;z-index:2;
+  }
+  #close-letter:hover{opacity:.6;}
+
+  .pages-viewport{
+    overflow-y:auto;max-height:56dvh;padding-top:1.6rem;
+  }
+  .pages-viewport::-webkit-scrollbar{width:6px;}
+  .pages-viewport::-webkit-scrollbar-thumb{background:var(--paper-shadow);border-radius:6px;}
+  .page{display:none;}
+  .page.active{display:block;animation:pageFade .4s ease;}
+
+  .letter-card h2{
+    font-family:var(--script-font);font-weight:400;
+    font-size:clamp(1.8rem,6vw,2.6rem);
+    color:var(--rose-dark);margin:0 0 1.1rem 0;text-align:center;
+  }
+  .letter-card p{
+    font-family:var(--serif-font);
+    font-size:clamp(1.05rem,3vw,1.25rem);
+    line-height:1.7;
+    margin:0 0 1.1rem 0;
+    text-align:justify;
+  }
+  .letter-card .firma{
+    font-family:var(--script-font);
+    font-size:clamp(1.6rem,5vw,2.1rem);
+    text-align:right;color:var(--rose-dark);margin-top:1.6rem;
+  }
+  .firma-text{
+    display:inline-block;overflow:hidden;white-space:nowrap;
+    width:0;vertical-align:bottom;
+    border-right:2px solid transparent;
+  }
+  .firma-text.write{
+    animation:signWrite 1.7s steps(28,end) forwards;
+  }
+  .firma-text.write.blink{
+    border-right-color:var(--rose-dark);
+    animation:signWrite 1.7s steps(28,end) forwards, blinkCursor .7s step-end 4;
+  }
+  @keyframes signWrite{ to{width:100%;} }
+  @keyframes blinkCursor{ 50%{border-color:transparent;} }
+
+  /* polaroid + carousel */
+  .polaroid{
+    position:relative;
+    background:#fff;padding:10px 10px 26px;
+    box-shadow:0 6px 14px rgba(0,0,0,.22);
+    transform:rotate(-3deg);width:66%;margin:0 auto 1.4rem;border-radius:2px;
+  }
+  .polaroid img{width:100%;aspect-ratio:1/1;object-fit:cover;background:#ddd;display:block;border-radius:1px;}
+  .polaroid .cap{font-family:var(--script-font);text-align:center;color:#5a5045;font-size:1.05rem;margin-top:.3rem;}
+
+  .carousel{position:relative;margin:0 0 1.2rem;}
+  .carousel-viewport{overflow:hidden;border-radius:8px;}
+  .carousel-track{display:flex;transition:transform .5s ease;}
+  .carousel-slide{position:relative;flex:0 0 100%;padding:6px;box-sizing:border-box;background:#fff;}
+  .carousel-slide img{
+    width:100%;aspect-ratio:4/3;object-fit:cover;background:#ddd;display:block;
+    border:2px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.18) inset, 0 0 0 1px var(--paper-shadow);
+    border-radius:4px;
+  }
+  .car-btn{
+    position:absolute;top:50%;transform:translateY(-50%);
+    background:rgba(0,0,0,.4);color:#fff;border:none;
+    width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.05rem;
+  }
+  .car-btn.prev{left:6px;} .car-btn.next{right:6px;}
+  .car-dots{display:flex;justify-content:center;gap:6px;margin-top:.5rem;}
+  .car-dots button{width:7px;height:7px;border-radius:50%;background:var(--paper-shadow);border:none;padding:0;cursor:pointer;}
+  .car-dots button.active{background:var(--rose-dark);}
+
+  /* etiqueta de fecha/lugar, arriba a la izquierda de cada foto */
+  .photo-caption{
+    position:absolute;top:9px;left:9px;z-index:2;
+    background:rgba(255,255,255,.88);
+    color:var(--rose-dark);
+    font-family:var(--serif-font);font-style:italic;
+    font-size:.72rem;line-height:1.25;
+    padding:.3rem .55rem;border-radius:7px;
+    max-width:72%;
+    box-shadow:0 2px 6px rgba(0,0,0,.18);
+    transform:rotate(-2deg);
+  }
+
+  /* corazoncitos y detalles decorativos, esparcidos por script */
+  .photo-deco{
+    position:absolute;z-index:2;pointer-events:auto;cursor:pointer;
+    filter:drop-shadow(0 1px 1px rgba(0,0,0,.3));
+    transform:rotate(var(--deco-rot,0deg));
+    background:none;border:none;font-size:inherit;
+    padding:.5rem;margin:-.5rem;line-height:1;
+  }
+  .photo-deco.tapped{
+    animation:decoPop .45s ease forwards;
+    pointer-events:none;
+  }
+  @keyframes decoPop{
+    0%{transform:rotate(var(--deco-rot,0deg)) scale(1);opacity:1;}
+    35%{transform:rotate(var(--deco-rot,0deg)) scale(1.8);opacity:1;}
+    100%{transform:rotate(var(--deco-rot,0deg)) scale(0);opacity:0;}
+  }
+
+  .map-frame{margin:0 0 .6rem;}
+  .map-placeholder{
+    background:repeating-linear-gradient(45deg,#f1ece0,#f1ece0 10px,#e9e2d0 10px,#e9e2d0 20px);
+    border:1.5px dashed var(--paper-shadow);border-radius:8px;
+    padding:2rem 1rem;text-align:center;
+    font-family:var(--ui-font);font-size:.8rem;color:#8a7a5c;
+  }
+  .map-placeholder span{display:block;font-size:1.4rem;margin-bottom:.4rem;}
+  .map-frame iframe{
+    width:100%;height:220px;border:0;border-radius:8px;
+    display:block;
+  }
+
+  .us-timeline-label{
+    font-family:var(--ui-font);font-size:.72rem;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--rose-dark);opacity:.75;
+    text-align:center;margin:1.6rem 0 .8rem;
+  }
+  .us-timeline{
+    position:relative;margin:0 0 1.4rem;padding-left:1.7rem;
+    display:flex;flex-direction:column;gap:1.1rem;
+  }
+  .us-timeline::before{
+    content:"";position:absolute;left:.5rem;top:.3rem;bottom:.3rem;
+    width:2px;background:var(--paper-shadow);
+  }
+  .us-timeline-item{position:relative;}
+  .us-timeline-item::before{
+    content:"";position:absolute;left:-1.2rem;top:.2rem;
+    width:9px;height:9px;border-radius:50%;
+    background:var(--gold);box-shadow:0 0 0 3px var(--paper);
+  }
+  .us-timeline-item .label{
+    font-family:var(--serif-font);font-size:1.02rem;font-weight:600;
+    color:var(--rose-dark);margin:0;text-align:left;
+  }
+  .us-timeline-item .date{
+    font-family:var(--ui-font);font-size:.78rem;color:var(--ink);
+    opacity:.7;margin:.15rem 0 0;text-align:left;
+  }
+
+  /* book nav */
+  .book-nav{
+    display:flex;align-items:center;justify-content:center;gap:1rem;
+    padding-top:1rem;flex-shrink:0;
+  }
+  .book-nav button{
+    background:none;border:1.5px solid var(--rose-dark);color:var(--rose-dark);
+    width:32px;height:32px;border-radius:50%;font-size:1.05rem;cursor:pointer;
+    flex-shrink:0;
+  }
+  .book-nav button:disabled{opacity:.3;cursor:default;}
+  .page-dots{display:flex;justify-content:center;gap:6px;}
+  .page-dots button{width:7px;height:7px;border-radius:50%;background:var(--paper-shadow);border:none;padding:0;cursor:pointer;}
+  .page-dots button.active{background:var(--rose-dark);}
+
+  .extra-btn,
+  .voice-btn{
+    display:block;margin:1rem auto 0;
+    font-family:var(--ui-font);background:none;border:1.5px dashed var(--gold);
+    color:var(--rose-dark);padding:.55rem 1.1rem;border-radius:30px;
+    cursor:pointer;font-size:.78rem;flex-shrink:0;
+  }
+  .voice-btn.playing{background:var(--rose-dark);color:#fff;border-color:var(--rose-dark);}
+
+  .heart-tap-summary{
+    text-align:center;font-family:var(--serif-font);font-style:italic;
+    font-size:.95rem;color:var(--rose-dark);opacity:.85;
+    margin:0 0 .4rem;
+  }
+
+  /* ---- certificado de amor ---- */
+  #certificate-overlay{
+    position:fixed;inset:0;z-index:65;
+    background:rgba(0,0,0,.65);
+    display:flex;align-items:center;justify-content:center;
+    padding:5vh 5vw;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .4s ease;
+  }
+  #certificate-overlay.active{opacity:1;visibility:visible;pointer-events:auto;}
+  .certificate-card{
+    position:relative;width:min(92vw,440px);
+    transform:scale(.94);transition:transform .4s cubic-bezier(.22,1,.36,1);
+  }
+  #certificate-overlay.active .certificate-card{transform:scale(1);}
+  #certificate-download-btn{margin-top:1.1rem;}
+  #close-certificate{
+    position:absolute;top:-2.2rem;right:0;
+    background:none;border:none;font-size:1.3rem;color:#fff;
+    cursor:pointer;opacity:.85;
+  }
+  .certificate-inner{
+    background:var(--paper);
+    border:3px double var(--gold);
+    border-radius:6px;
+    padding:2.2rem 1.8rem;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+    max-height:82dvh;overflow-y:auto;
+  }
+  .cert-kicker{
+    font-family:var(--ui-font);font-size:.7rem;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--gold);opacity:.85;margin:0 0 1rem;
+  }
+  .cert-title{
+    font-family:var(--script-font);font-weight:400;font-size:1.6rem;
+    color:var(--rose-dark);line-height:1.25;margin:0 0 1rem;
+  }
+  .cert-divider{color:var(--red);font-size:1.3rem;margin-bottom:1.1rem;}
+  .cert-body{
+    font-family:var(--serif-font);font-size:1rem;line-height:1.6;
+    color:var(--ink);margin:0 0 .8rem;
+  }
+  .cert-name{font-weight:600;color:var(--rose-dark);}
+  .cert-her-name{
+    font-family:var(--script-font);font-weight:400;font-size:1.9rem;
+    color:var(--rose-dark);margin:.2rem 0 1rem;
+  }
+  .cert-signature{
+    margin-top:1.6rem;padding-top:1rem;
+    border-top:1px solid var(--paper-shadow);
+    display:flex;flex-direction:column;gap:.15rem;
+  }
+  .cert-sign-line{
+    font-family:var(--script-font);font-size:1.2rem;color:var(--rose-dark);
+  }
+  .cert-sign-date{
+    font-family:var(--ui-font);font-size:.72rem;color:var(--ink);opacity:.65;
+  }
+
+  /* ---- calcular cantidad de amor ---- */
+  #love-calc-overlay{
+    position:fixed;inset:0;z-index:75;
+    background:rgba(4,6,16,.9);
+    display:flex;align-items:center;justify-content:center;
+    padding:6vh 6vw;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .35s ease;
+  }
+  #love-calc-overlay.active{opacity:1;visibility:visible;pointer-events:auto;}
+  .love-calc-card{
+    position:relative;max-width:min(90vw,420px);text-align:center;color:#fff;
+  }
+  #close-love-calc{
+    position:absolute;top:-2.4rem;right:0;
+    background:none;border:none;font-size:1.3rem;color:#fff;
+    cursor:pointer;opacity:.85;
+  }
+  .lc-step{display:none;}
+  .lc-step.active{display:block;animation:pageFade .5s ease;}
+  .lc-line{
+    font-family:var(--serif-font);font-size:1.15rem;margin:0 0 .8rem;
+    color:var(--gold-soft);
+  }
+  .lc-line span{color:#fff;font-weight:600;}
+  .lc-equation-label{
+    font-family:var(--ui-font);font-size:.75rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--gold-soft);opacity:.85;margin:0 0 1rem;
+  }
+  .lc-formula{
+    font-family:var(--serif-font);font-size:1.15rem;line-height:1.7;
+    color:#fff;max-width:30ch;margin:0 auto;
+  }
+  .lc-spinner{
+    width:38px;height:38px;margin:0 auto 1rem;
+    border:3px solid rgba(255,255,255,.25);
+    border-top-color:var(--gold-soft);
+    border-radius:50%;
+    animation:lcSpin .9s linear infinite;
+  }
+  @keyframes lcSpin{ to{transform:rotate(360deg);} }
+  .lc-number{
+    font-family:var(--ui-font);font-weight:700;
+    font-size:clamp(2rem,10vw,3.4rem);
+    color:var(--gold-soft);margin:0 0 1rem;
+    text-shadow:0 0 24px rgba(232,183,93,.5);
+  }
+  .lc-number.infinity{font-size:clamp(3.2rem,16vw,5.2rem);animation:lcPop .6s ease;}
+  @keyframes lcPop{
+    0%{transform:scale(.4);opacity:0;}
+    60%{transform:scale(1.15);opacity:1;}
+    100%{transform:scale(1);}
+  }
+  .lc-final{
+    font-family:var(--serif-font);font-style:italic;font-size:1.15rem;
+    color:#fff;max-width:26ch;margin:0 auto;
+  }
+  .lc-next{
+    margin-top:1.6rem;border-color:var(--gold-soft);color:var(--gold-soft);
+  }
+  .lc-next:hover{background:rgba(255,255,255,.08);}
+  .final-actions{
+    display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;
+    margin-top:1.4rem;
+  }
+  .final-btn{
+    display:flex;flex-direction:column;align-items:center;gap:.5rem;
+    width:132px;padding:1.3rem 1rem 1.1rem;
+    background:linear-gradient(160deg,#fff,var(--paper));
+    border:2px solid var(--gold);border-radius:18px;
+    cursor:pointer;
+    box-shadow:0 6px 16px rgba(0,0,0,.12);
+    transition:transform .18s ease, box-shadow .18s ease;
+  }
+  .final-btn:hover{transform:translateY(-4px);box-shadow:0 10px 22px rgba(0,0,0,.18);}
+  .final-btn:active{transform:scale(.95);}
+  .final-icon{font-size:2.6rem;line-height:1;}
+  .final-label{
+    font-family:var(--ui-font);font-size:.82rem;font-weight:500;
+    color:var(--rose-dark);text-align:center;line-height:1.3;
+  }
+
+  /* ---- Quiz screen ---- */
+  .quiz-card{
+    background:var(--paper);color:var(--ink);border-radius:10px;
+    padding:2.2rem 1.6rem;width:min(92vw,460px);
+    box-shadow:0 20px 50px rgba(0,0,0,.5);text-align:center;
+  }
+  .quiz-q{display:none;}
+  .quiz-q.active{display:block;animation:pageFade .4s ease;}
+  .quiz-label{
+    font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--rose-dark);opacity:.7;margin-bottom:.5rem;
+  }
+  .quiz-q h3{font-family:var(--serif-font);font-size:1.35rem;margin:.2rem 0 1.3rem;}
+  .quiz-options{display:flex;flex-direction:column;gap:.6rem;}
+  .quiz-opt{
+    font-family:var(--ui-font);font-size:.92rem;padding:.7rem 1rem;
+    border-radius:8px;border:1.5px solid var(--paper-shadow);background:#fff;
+    cursor:pointer;transition:background .2s, border-color .2s;
+  }
+  .quiz-opt:hover{background:#f3ecd8;}
+  .quiz-opt.wrong-flash{
+    background:#fbe1df;border-color:#c0392b;color:#8f2a20;
+    animation:quizShake .4s ease;
+  }
+  .quiz-opt.correct-flash{
+    background:#e9f7ee;border-color:#3f9a5c;color:#256b3c;
+  }
+  @keyframes quizShake{
+    0%,100%{transform:translateX(0);}
+    20%{transform:translateX(-6px);}
+    40%{transform:translateX(6px);}
+    60%{transform:translateX(-4px);}
+    80%{transform:translateX(4px);}
+  }
+  .quiz-final{display:none;}
+  .quiz-final.active{display:block;animation:pageFade .5s ease;}
+  .quiz-final h2{font-family:var(--script-font);font-size:2.1rem;color:var(--rose-dark);margin:0 0 .6rem;}
+  .quiz-final p{font-family:var(--serif-font);font-size:1.1rem;margin:0;}
+  #replay-btn{
+    margin-top:1.6rem;font-family:var(--ui-font);background:var(--rose-dark);
+    color:#fff;border:none;padding:.7rem 1.4rem;border-radius:30px;
+    cursor:pointer;font-size:.85rem;letter-spacing:.05em;
+  }
+
+  .reason-text{
+    font-family:var(--serif-font);font-style:italic;
+    font-size:clamp(1.1rem,3.4vw,1.35rem);
+    text-align:center;min-height:4.5rem;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--rose-dark);
+  }
+  .reason-text.pop{animation:reasonPop .4s ease;}
+  @keyframes reasonPop{
+    0%{opacity:0;transform:scale(.9) translateY(6px);}
+    100%{opacity:1;transform:scale(1) translateY(0);}
+  }
+
+  .coupon-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;
+    margin-top:1.2rem;
+  }
+  .coupon-grid .coupon:last-child:nth-child(odd){
+    grid-column:1 / span 2;
+    width:calc(50% - .45rem);
+    margin:0 auto;
+  }
+  .coupon{width:100%;aspect-ratio:4/5;perspective:700px;cursor:pointer;}
+  .coupon-inner{
+    position:relative;width:100%;height:100%;
+    transition:transform .6s cubic-bezier(.22,1,.36,1);
+    transform-style:preserve-3d;
+  }
+  .coupon.flipped .coupon-inner{transform:rotateY(180deg);}
+  .coupon-face{
+    position:absolute;inset:0;backface-visibility:hidden;
+    border-radius:12px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;text-align:center;
+    padding:.6rem;box-sizing:border-box;
+  }
+  .coupon-front{
+    background:linear-gradient(160deg,var(--gold-soft),var(--gold));
+    color:#fff;font-size:1.9rem;gap:.3rem;
+    box-shadow:0 4px 10px rgba(0,0,0,.15);
+  }
+  .coupon-front span{
+    font-family:var(--ui-font);font-size:.65rem;
+    letter-spacing:.05em;text-transform:uppercase;
+  }
+  .coupon-back{
+    transform:rotateY(180deg);
+    background:var(--paper);color:var(--rose-dark);
+    border:2px dashed var(--gold);
+    font-family:var(--serif-font);font-style:italic;
+    font-size:.92rem;line-height:1.35;
+  }
+
+  /* focus visibility for accessibility */
+  #charge-star:focus-visible,
+  #envelope:focus-visible,
+  .seal-group:focus-visible,
+  #close-letter:focus-visible,
+  .music-toggle:focus-visible{
+    outline:2px solid var(--gold-soft);outline-offset:4px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================================================= -->
+<!--  🔒 PANTALLA DE BLOQUEO — se muestra hasta la fecha/hora   -->
+<!--  definida en UNLOCK_TIME (busca esa constante en el        -->
+<!--  <script> más abajo) y cambia el número si quieres otra    -->
+<!--  fecha u hora de desbloqueo.                                -->
+<!-- ======================================================= -->
+<div id="lock-screen">
+  <svg class="lock-icon" id="lock-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="15" y="29" width="34" height="26" rx="6"></rect>
+    <path d="M22 29v-8a10 10 0 0 1 20 0v8"></path>
+    <circle cx="32" cy="41" r="2.6" fill="currentColor" stroke="none"></circle>
+  </svg>
+  <p class="lock-label">Se revela en</p>
+  <div class="lock-countdown">
+    <div class="unit"><span class="num" id="lock-d">00</span><span class="lbl">Días</span></div>
+    <div class="unit"><span class="num" id="lock-h">00</span><span class="lbl">Horas</span></div>
+    <div class="unit"><span class="num" id="lock-m">00</span><span class="lbl">Min</span></div>
+    <div class="unit"><span class="num" id="lock-s">00</span><span class="lbl">Seg</span></div>
+  </div>
+</div>
+
+<div id="dawn-overlay"></div>
+<div id="stars-layer"></div>
+<div id="flash-overlay"></div>
+
+<div id="image-preview-overlay">
+  <div class="image-preview-card">
+    <button id="image-preview-close" aria-label="Cerrar">✕</button>
+    <img id="image-preview-img" alt="Imagen generada">
+    <p class="image-preview-hint">Mantén presionada la imagen para guardarla, o usa el botón</p>
+    <button id="image-preview-download" class="extra-btn">💾 Descargar</button>
+  </div>
+</div>
+<button id="hidden-star" aria-label="???"></button>
+<div id="wish-toast"><p id="wish-toast-text"></p></div>
+
+<!-- ======================================================= -->
+<!--  💌 CARTA SECRETA — edita este mensaje. Se abre al        -->
+<!--  encontrar la estrellita escondida en el cielo.           -->
+<!-- ======================================================= -->
+<div id="secret-overlay">
+  <div class="secret-card">
+    <button id="close-secret" aria-label="Cerrar">✕</button>
+    <h2>Encontraste la estrella ✦</h2>
+    <p>
+      Planeo pasar toda mi vida contigo, amor.
+    </p>
+    <p>
+      Gracias por aparecer en mi vida, espero celebrar todos tus
+      cumpleaños juntos ♥
+    </p>
+
+    <!-- ======================================================= -->
+    <!--  🤫 FOTOS SECRETAS — 9 fotos ocultas tras un velo         -->
+    <!--  borroso. Reemplaza fotosecret1.jpeg a fotosecret9.jpeg     -->
+    <!--  por tus fotos reales, en la misma carpeta que este HTML. -->
+    <!-- ======================================================= -->
+    <div class="secret-photos">
+      <div class="secret-photos-stack" id="secret-photos-stack">
+        <img class="secret-photo" src="fotosecret1.jpeg" alt="Foto secreta 1">
+        <img class="secret-photo" src="fotosecret2.jpeg" alt="Foto secreta 2">
+        <img class="secret-photo" src="fotosecret3.jpeg" alt="Foto secreta 3">
+        <img class="secret-photo" src="fotosecret4.jpeg" alt="Foto secreta 4">
+        <img class="secret-photo" src="fotosecret5.jpeg" alt="Foto secreta 5">
+        <img class="secret-photo" src="fotosecret6.jpeg" alt="Foto secreta 6">
+        <img class="secret-photo" src="fotosecret7.jpeg" alt="Foto secreta 7">
+        <img class="secret-photo" src="fotosecret8.jpeg" alt="Foto secreta 8">
+        <img class="secret-photo" src="fotosecret9.jpeg" alt="Foto secreta 9">
+        <div class="secret-photos-veil" id="secret-photos-veil"><span>Desvelar ✦</span></div>
+      </div>
+      <p class="secret-photos-hint">Toca la foto para pasar a la siguiente</p>
+      <button id="secret-photos-download" class="extra-btn">💾 Descargar</button>
+    </div>
+  </div>
+</div>
+
+<div id="prediction-overlay">
+  <div class="secret-card">
+    <button id="close-prediction" aria-label="Cerrar">✕</button>
+    <h2>🔮 El destino dice…</h2>
+    <p id="prediction-text"></p>
+    <button id="prediction-again" class="extra-btn">Otra predicción →</button>
+  </div>
+</div>
+
+<div id="certificate-overlay">
+  <div class="certificate-card">
+    <button id="close-certificate" aria-label="Cerrar">✕</button>
+    <div class="certificate-inner" id="certificate-inner">
+      <p class="cert-kicker">✦ Certificado de amor ✦</p>
+      <h2 class="cert-title">Oficialmente la persona<br>más importante de mi vida</h2>
+      <div class="cert-divider">♥</div>
+      <p class="cert-body">
+        Yo, <span class="cert-name">Juan Ignacio Moya Bravo</span>,
+        certifico ante quien lo lea que
+      </p>
+      <p class="cert-her-name">Fernanda Belén Castillo Márquez</p>
+      <p class="cert-body">
+        es, sin ninguna duda, la persona más importante de mi vida.
+      </p>
+      <div class="cert-signature">
+        <span class="cert-sign-line">Juan Ignacio Moya Bravo</span>
+        <span class="cert-sign-date" id="cert-date"></span>
+      </div>
+    </div>
+    <button id="certificate-download-btn" class="extra-btn">💾 Descargar certificado</button>
+  </div>
+</div>
+
+<div id="love-calc-overlay">
+  <div class="love-calc-card">
+    <button id="close-love-calc" aria-label="Cerrar">✕</button>
+
+    <div class="lc-step lc-step-1">
+      <p class="lc-line">Corazones tocados: <span id="lc-hearts">0</span></p>
+      <p class="lc-line">Tiempo juntos: <span id="lc-time"></span></p>
+      <button class="extra-btn lc-next" id="lc-next-1">Siguiente →</button>
+    </div>
+
+    <div class="lc-step lc-step-2">
+      <p class="lc-equation-label">Ecuación del amor</p>
+      <p class="lc-formula" id="lc-formula">(corazones × segundos juntos) ÷ 0</p>
+      <button class="extra-btn lc-next" id="lc-next-2">Calcular →</button>
+    </div>
+
+    <div class="lc-step lc-step-3">
+      <p class="lc-number" id="lc-number">0</p>
+      <p class="lc-final">Esta es la cantidad de amor que siento por ti, amor. Muak ♥</p>
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!--  📱 FONDO 1 — igual a la página del amanecer. Cambia la    -->
+<!--  frase si quieres, usa la misma gatitos-corazon.png.       -->
+<!-- ======================================================= -->
+<div class="wallpaper-template bg-sunrise" id="wallpaper-sunrise">
+  <div class="wp-content">
+    <div class="wp-sun"></div>
+    <h2 class="wp-title">Un nuevo amanecer</h2>
+    <p class="wp-quote dark">Que este sea el primero de muchos amaneceres juntos, mi amor ♥</p>
+    <img class="wp-cats-img" src="gatitos-corazon.png" alt="">
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!--  📱 FONDO 2 — collage con estrellas de fondo. Usa las      -->
+<!--  mismas fotos foto-principal, foto1, foto4 y foto5.        -->
+<!-- ======================================================= -->
+<div class="wallpaper-template bg-stars" id="wallpaper-collage">
+  <div class="wp-stars-layer" id="wp-stars-layer"></div>
+  <div class="wp-content">
+    <h2 class="wp-name">Fer ♥</h2>
+    <p class="wp-quote">Contigo, cada día es especial ♥</p>
+    <div class="wp-collage">
+      <img src="foto-principal.jpeg" alt="">
+      <img src="foto1.jpeg" alt="">
+      <img src="foto4.jpeg" alt="">
+      <img src="foto6.jpg" alt="">
+    </div>
+  </div>
+</div>
+
+<!-- ======================================================= -->
+<!--  🎵 MÚSICA: coloca un archivo llamado musica.mp3 en la    -->
+<!--  misma carpeta que este HTML (o cambia el nombre abajo).  -->
+<!--  Empieza a sonar apenas ella toca la estrella.             -->
+<!-- ======================================================= -->
+<audio id="bg-music" loop preload="none">
+  <source src="musica.mp3" type="audio/mpeg">
+</audio>
+<button id="music-toggle" class="music-toggle" aria-label="Silenciar música" aria-pressed="false">♪</button>
+<button id="quiet-toggle" class="quiet-toggle" aria-label="Modo lectura tranquila" aria-pressed="false">🌙</button>
+
+<div id="app">
+
+  <section id="screen-intro" class="screen active">
+    <div id="charge-star" class="charge-star" tabindex="0" role="button" aria-label="Toca la estrella">
+      <span class="star-icon">✦</span>
+    </div>
+    <p class="hint">toca la estrella</p>
+  </section>
+
+  <section id="screen-greeting" class="screen">
+    <h1>¡Feliz cumpleaños,<br>Fer <span class="heart-icon">♥</span></h1>
+    <p class="sub">Hoy es tu día, y quería dejarte algo especial.</p>
+    <p class="anniv" id="days-counter"></p>
+    <div class="envelope-wrap">
+      <div id="envelope" tabindex="0" role="button" aria-label="Arranca el sello para abrir la carta">
+        <div class="back"></div>
+        <div class="letter-peek"></div>
+        <div class="flap"></div>
+        <div class="tap-label">arranca el sello</div>
+      </div>
+      <div class="seal-group">
+        <div class="twine"></div>
+        <div class="seal">F</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="screen-letter" class="screen">
+    <div class="letter-card">
+      <button id="close-letter" aria-label="Cerrar carta">✕</button>
+      <div class="reading-progress"><div class="reading-progress-fill" id="reading-progress-fill"></div></div>
+
+      <div class="pages-viewport" id="pages-viewport">
+
+        <!-- ======================================================= -->
+        <!--  ✏️  PÁGINA 1 — edita tu mensaje aquí                     -->
+        <!-- ======================================================= -->
+        <section class="page active" data-page="0">
+          <h2>Para ti, amor</h2>
+          <p>
+            Primero que todo me gustaría desearte una feliz cumpleañooooooooooooos.
+          </p>
+          <p>
+            Espero que la puedas pasar lo mejor en tu día especial, que te sientas
+            como la persona más importante del mundo, y también que el día de tu
+            fiesta también lo puedas pasar súper, con las personas que más quieres
+            (obvio yo igual jeje). Pero ojalá todo pueda salir bien y sea muy lindo
+            recuerdo para ti, amor.
+          </p>
+          <p>
+            También quiero mencionar que ya cumples 20 años, no es menor, ya uno se
+            siente más adulto (así no me siento tan viejo igual jeje). Pero bueno,
+            un año más tampoco debes tomártelo tan a pecho la verdad. Y espero que
+            puedas cumplir mucho más junto a mi lado.
+          </p>
+          <p>
+            Considero que es un año más, un año donde pasaron cosas importantes,
+            como tus estudios; iniciar tus estudios es un paso muy importante, no
+            menor, hay que tener mucha valentía para hacerlo, especialmente en ti,
+            entonces me llena de felicidad que lo estés llevando a cabo. También
+            gracias a esto nos pudimos conocer, no sabes lo feliz que me hace haber
+            decidido hablarte, fue mi mejor decisión sin duda.
+          </p>
+          <p>
+            Por último, veo cómo cada día que pasa te vuelves más hermosa para mis
+            ojos, es sorprendente, me gustaría grabar una película infinita para
+            capturar cada momento del día junto a ti, amor. Me vuelves loco, y
+            agradezco mucho a la vida haberte conocido.
+          </p>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  ✏️  PÁGINA 2 — sigue escribiendo aquí                    -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="1">
+          <p>
+            Sin más, espero que te hayan gustado las cosas que te daré, no siento
+            que sea tanto, me hubiera gustado regalarte muchas más cosas la verdad,
+            amor, pero te aseguro que en el futuro te volveré la mujer más feliz
+            del mundo.
+          </p>
+          <p>Eres la persona más importante para mí.</p>
+          <p style="text-align:center;font-size:1.1em;">TE AMOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO.</p>
+          <p style="text-align:center;">MUAK MUAK MUAK MUAK MUAK MUAK MUAK MUAK MUAK MUAK</p>
+          <p style="font-style:italic;">PD: Hay un mensaje escondido por ahí.</p>
+          <div class="firma"><span class="firma-text" id="firma-text">— J.M.Bravo</span></div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  📸 PÁGINA 3 — fotos. Reemplaza foto-principal.jpeg,       -->
+        <!--  foto1.jpeg a foto5.jpeg por tus fotos reales, puestas en   -->
+        <!--  la misma carpeta que este HTML. Cambia también el texto  -->
+        <!--  de cada "photo-caption" por la fecha o lugar que quieras. -->
+        <!--  foto6.jpg es una foto aparte, solo se usa en el collage  -->
+        <!--  del fondo de pantalla (no aparece en este carrusel).     -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="2">
+          <h2>Nuestros momentos</h2>
+          <div class="polaroid">
+            <img src="foto-principal.jpeg" alt="Nosotros">
+            <div class="photo-caption">Aquí, tú y yo ♥</div>
+            <div class="cap">tú y yo</div>
+          </div>
+          <div class="carousel">
+            <div class="carousel-viewport">
+              <div class="carousel-track" id="carousel-track">
+                <div class="carousel-slide">
+                  <img src="foto1.jpeg" alt="Recuerdo 1">
+                  <div class="photo-caption">Nuestra primera foto juntos ♥</div>
+                </div>
+                <div class="carousel-slide">
+                  <img src="foto2.jpeg" alt="Recuerdo 2">
+                  <div class="photo-caption">Mi primer regalo ♥</div>
+                </div>
+                <div class="carousel-slide">
+                  <img src="foto3.jpeg" alt="Recuerdo 3">
+                  <div class="photo-caption">Nuestro primer aniversario ♥</div>
+                </div>
+                <div class="carousel-slide">
+                  <img src="foto4.jpeg" alt="Recuerdo 4">
+                  <div class="photo-caption">Qué hermosos ♥</div>
+                </div>
+                <div class="carousel-slide">
+                  <img src="foto5.jpeg" alt="Recuerdo 5">
+                  <div class="photo-caption">Me encanta esta foto ♥</div>
+                </div>
+              </div>
+            </div>
+            <button class="car-btn prev" id="car-prev" aria-label="Foto anterior">‹</button>
+            <button class="car-btn next" id="car-next" aria-label="Foto siguiente">›</button>
+            <div class="car-dots" id="carousel-dots">
+              <button class="active" data-goto="0" aria-label="Foto 1"></button>
+              <button data-goto="1" aria-label="Foto 2"></button>
+              <button data-goto="2" aria-label="Foto 3"></button>
+              <button data-goto="3" aria-label="Foto 4"></button>
+              <button data-goto="4" aria-label="Foto 5"></button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  📍 PÁGINA 4 — mapa. Ve a Google Maps, busca el lugar,    -->
+        <!--  click en "Compartir" → "Insertar un mapa", copia el      -->
+        <!--  código &lt;iframe&gt; y reemplaza el div.map-placeholder  -->
+        <!--  de aquí abajo con ese iframe.                             -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="3">
+          <h2>Dónde empezamos</h2>
+          <div class="map-frame">
+            <iframe
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-71.6767717%2C-35.4292126%2C-71.6647717%2C-35.4212126&layer=mapnik&marker=-35.4252126%2C-71.6707717"
+              loading="lazy"></iframe>
+          </div>
+          <p style="text-align:center;font-size:.85rem;margin-top:.4rem;">
+            <a href="https://www.google.com/maps/place/CFT+San+Agust%C3%ADn+-+Cuatro+Pte.+1223,+3467284+Talca,+Maule/@-35.4252126,-71.6707717,15z" target="_blank" rel="noopener" style="color:var(--ink);opacity:.7;">Ver en Google Maps ↗</a>
+          </p>
+          <p style="text-align:center;font-size:.95rem;">
+            03 de julio · el día que empezamos ♥
+          </p>
+
+          <!-- ======================================================= -->
+          <!--  🗺️ NUESTRO MAPA — línea de tiempo. Cambia las fechas o    -->
+          <!--  etiquetas si quieres, o agrega más pasos copiando un      -->
+          <!--  bloque .us-timeline-item entero.                          -->
+          <!-- ======================================================= -->
+          <p class="us-timeline-label">Nuestro mapa</p>
+          <div class="us-timeline">
+            <div class="us-timeline-item">
+              <p class="label">💬 Primera vez que hablamos</p>
+              <p class="date">26 de marzo</p>
+            </div>
+            <div class="us-timeline-item">
+              <p class="label">❤️ Oficializamos</p>
+              <p class="date">03 de julio</p>
+            </div>
+            <div class="us-timeline-item">
+              <p class="label">✨ Hoy</p>
+              <p class="date">Celebrando tu cumpleaños, y seguimos escribiendo esta historia</p>
+            </div>
+          </div>
+
+          <!-- ======================================================= -->
+          <!--  🎙️ MENSAJE DE VOZ: coloca un archivo llamado             -->
+          <!--  mensaje-voz.mp3 en la misma carpeta que este HTML.       -->
+          <!-- ======================================================= -->
+          <audio id="voice-audio" preload="none">
+            <source src="mensaje-voz.mp3" type="audio/mpeg">
+          </audio>
+          <button id="voice-btn" class="voice-btn">🎙️ Escúchame</button>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  💗 PÁGINA 5 — razones. Cambia, borra o agrega frases a   -->
+        <!--  la lista REASONS que está en el <script> más abajo.      -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="4">
+          <h2>Razones para amarte</h2>
+          <p id="reason-text" class="reason-text">Toca el botón para ver la primera razón ♥</p>
+          <button id="reason-btn" class="extra-btn">Otra razón más →</button>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  🎟️ PÁGINA 6 — vales canjeables. Cambia el texto de       -->
+        <!--  cada coupon-back por lo que quieras ofrecerle.           -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="5">
+          <h2>Vales para canjear</h2>
+          <p style="text-align:center;font-size:.85rem;opacity:.75;margin-top:-.6rem;">
+            Toca cada uno para descubrirlo
+          </p>
+          <div class="coupon-grid">
+            <div class="coupon" tabindex="0" role="button" aria-label="Voltear vale">
+              <div class="coupon-inner">
+                <div class="coupon-face coupon-front">🎟️<span>Toca</span></div>
+                <div class="coupon-face coupon-back">Una cita sorpresa, elegida por mí</div>
+              </div>
+            </div>
+            <div class="coupon" tabindex="0" role="button" aria-label="Voltear vale">
+              <div class="coupon-inner">
+                <div class="coupon-face coupon-front">🎟️<span>Toca</span></div>
+                <div class="coupon-face coupon-back">El postre que tú quieras, cuando quieras</div>
+              </div>
+            </div>
+            <div class="coupon" tabindex="0" role="button" aria-label="Voltear vale">
+              <div class="coupon-inner">
+                <div class="coupon-face coupon-front">🎟️<span>Toca</span></div>
+                <div class="coupon-face coupon-back">Una escapada, solo nosotros dos</div>
+              </div>
+            </div>
+            <div class="coupon" tabindex="0" role="button" aria-label="Voltear vale">
+              <div class="coupon-inner">
+                <div class="coupon-face coupon-front">🎟️<span>Toca</span></div>
+                <div class="coupon-face coupon-back">Vemos la película que tú quieras</div>
+              </div>
+            </div>
+            <div class="coupon" tabindex="0" role="button" aria-label="Voltear vale">
+              <div class="coupon-inner">
+                <div class="coupon-face coupon-front">🎟️<span>Toca</span></div>
+                <div class="coupon-face coupon-back">Voy donde quieras, hacemos lo que quieras</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  🌅 PÁGINA 7 — el amanecer. Cambia la frase de abajo por  -->
+        <!--  la tuya (algo grande, tu cierre más bonito).             -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="6" data-dawn="true">
+          <div class="sunrise-scene">
+            <div class="sun"></div>
+            <h2>Un nuevo amanecer</h2>
+            <p>Que este sea el primero de muchos amaneceres juntos, mi amor ♥</p>
+            <!-- ======================================================= -->
+            <!--  🐱 Coloca aquí tu imagen de los gatitos. Guarda el PNG  -->
+            <!--  como "gatitos-corazon.png" en la misma carpeta que      -->
+            <!--  este HTML (el mismo lugar que tus fotos).               -->
+            <!-- ======================================================= -->
+            <img class="cats-heart" src="gatitos-corazon.png" alt="Gatitos con un corazón">
+          </div>
+        </section>
+
+        <!-- ======================================================= -->
+        <!--  🎬 PÁGINA 8 — cierre. Aquí viven el minijuego y guardar. -->
+        <!-- ======================================================= -->
+        <section class="page" data-page="7">
+          <h2>Antes de irte…</h2>
+          <p id="heart-tap-summary" class="heart-tap-summary"></p>
+          <div class="final-actions">
+            <button id="extra-surprise" class="final-btn">
+              <span class="final-icon">🎮</span>
+              <span class="final-label">Un juego rápido</span>
+            </button>
+            <button id="wallpaper-sunrise-btn" class="final-btn">
+              <span class="final-icon">🌅</span>
+              <span class="final-label">Fondo: Amanecer</span>
+            </button>
+            <button id="wallpaper-collage-btn" class="final-btn">
+              <span class="final-icon">🖼️</span>
+              <span class="final-label">Fondo: Collage</span>
+            </button>
+            <button id="love-calc-btn" class="final-btn">
+              <span class="final-icon">🧮</span>
+              <span class="final-label">Calcular cantidad de amor</span>
+            </button>
+            <button id="prediction-btn" class="final-btn">
+              <span class="final-icon">🔮</span>
+              <span class="final-label">Predicción del amor</span>
+            </button>
+            <button id="certificate-btn" class="final-btn">
+              <span class="final-icon">📜</span>
+              <span class="final-label">Certificado de amor</span>
+            </button>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="book-nav">
+        <button id="prev-page" aria-label="Página anterior">‹</button>
+        <div class="page-dots" id="page-dots">
+          <button class="active" data-goto="0" aria-label="Página 1"></button>
+          <button data-goto="1" aria-label="Página 2"></button>
+          <button data-goto="2" aria-label="Página 3"></button>
+          <button data-goto="3" aria-label="Página 4"></button>
+          <button data-goto="4" aria-label="Página 5"></button>
+          <button data-goto="5" aria-label="Página 6"></button>
+          <button data-goto="6" aria-label="Página 7"></button>
+          <button data-goto="7" aria-label="Página 8"></button>
+        </div>
+        <button id="next-page" aria-label="Página siguiente">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================= -->
+  <!--  🎮 MINIJUEGO — edita las preguntas y opciones aquí.      -->
+  <!--  No hay puntaje, es solo diversión: cualquier opción      -->
+  <!--  avanza a la siguiente pregunta.                          -->
+  <!-- ======================================================= -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-card">
+
+      <div class="quiz-q active" data-q="0">
+        <p class="quiz-label">Pregunta 1 de 5</p>
+        <h3>¿Cuándo oficializamos?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-correct="true">03 de julio</button>
+          <button class="quiz-opt">31 de agosto</button>
+          <button class="quiz-opt">30 de febrero</button>
+        </div>
+      </div>
+
+      <div class="quiz-q" data-q="1">
+        <p class="quiz-label">Pregunta 2 de 5</p>
+        <h3>¿Cuál fue la primera película que vimos juntos?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-correct="true">El resplandor</button>
+          <button class="quiz-opt">El increíble castillo vagabundo</button>
+          <button class="quiz-opt">Tiburón</button>
+        </div>
+      </div>
+
+      <div class="quiz-q" data-q="2">
+        <p class="quiz-label">Pregunta 3 de 5</p>
+        <h3>¿Cuál es mi comida favorita?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-correct="true">Tú ♥</button>
+          <button class="quiz-opt">Pizza</button>
+          <button class="quiz-opt">Helado</button>
+        </div>
+      </div>
+
+      <div class="quiz-q" data-q="3">
+        <p class="quiz-label">Pregunta 4 de 5</p>
+        <h3>¿Dónde fue la primera vez que hablamos?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-correct="true">En clase de anatomía</button>
+          <button class="quiz-opt">En la biblioteca</button>
+          <button class="quiz-opt">En el parque</button>
+        </div>
+      </div>
+
+      <div class="quiz-q" data-q="4">
+        <p class="quiz-label">Pregunta 5 de 5</p>
+        <h3>¿Qué es lo que más amo hacer contigo?</h3>
+        <div class="quiz-options">
+          <button class="quiz-opt" data-correct="true">Todo, mientras sea contigo ♥</button>
+          <button class="quiz-opt">Ver películas</button>
+          <button class="quiz-opt">Salir a caminar</button>
+        </div>
+      </div>
+
+      <div class="quiz-final">
+        <h2>¡Me conoces perfecto! ♥</h2>
+        <p>Gracias por ser tú. Feliz cumpleaños, amor.</p>
+        <button id="replay-btn">Ver todo de nuevo</button>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+(function(){
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // ---------- pantalla de bloqueo hasta la hora de desbloqueo ----------
+  // ✏️ cambia esta fecha/hora por la que quieras (año, mes -1, día, hora, min)
+  const UNLOCK_TIME = new Date(2026, 7, 24, 0, 0, 0); // 24 de agosto de 2026, 00:00
+  const lockScreen = document.getElementById('lock-screen');
+  const lockIcon = document.getElementById('lock-icon');
+  const lockD = document.getElementById('lock-d');
+  const lockH = document.getElementById('lock-h');
+  const lockM = document.getElementById('lock-m');
+  const lockS = document.getElementById('lock-s');
+  const LOCK_TOTAL_MS = Math.max(1, UNLOCK_TIME - new Date());
+  let lockTimer = null;
+
+  function updateLockScreen(){
+    const remaining = UNLOCK_TIME - new Date();
+    if(remaining <= 0){
+      lockScreen.classList.add('unlocking');
+      setTimeout(()=> lockScreen.remove(), 1200);
+      if(lockTimer) clearInterval(lockTimer);
+      return;
+    }
+    const totalSeconds = Math.floor(remaining / 1000);
+    const days = Math.floor(totalSeconds / 86400);
+    lockD.textContent = String(days).padStart(2,'0');
+    lockH.textContent = String(Math.floor((totalSeconds % 86400) / 3600)).padStart(2,'0');
+    lockM.textContent = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2,'0');
+    lockS.textContent = String(totalSeconds % 60).padStart(2,'0');
+
+    // mientras más cerca la hora, más transparente y menos borroso se ve el fondo
+    const progress = 1 - Math.min(1, remaining / LOCK_TOTAL_MS);
+    const bgAlpha = 0.97 - progress * 0.85;
+    const blurPx = 18 - progress * 17;
+    lockScreen.style.background = `rgba(4,4,7,${bgAlpha.toFixed(3)})`;
+    lockScreen.style.backdropFilter = `blur(${blurPx.toFixed(1)}px)`;
+    lockScreen.style.webkitBackdropFilter = `blur(${blurPx.toFixed(1)}px)`;
+
+    // en el último minuto, el candado tiembla de la emoción
+    lockIcon.classList.toggle('urgent', remaining <= 60000);
+  }
+
+  if(!lockScreen){
+    // nada que hacer si el bloque no está en el HTML
+  } else if(UNLOCK_TIME - new Date() <= 0){
+    lockScreen.remove();
+  } else {
+    updateLockScreen();
+    lockTimer = setInterval(updateLockScreen, 1000);
+  }
+
+  // ---------- tiempo juntos (meses, días y horas, en vivo) ----------
+  // ✏️ cambia el año/mes/día si el 3 de julio fue distinto
+  const ANIVERSARIO = new Date(2026, 6, 3);
+  const diasCounter = document.getElementById('days-counter');
+
+  function pluralize(n, singular, plural){
+    return `${n} ${n === 1 ? singular : plural}`;
+  }
+
+  function updateCounter(){
+    const now = new Date();
+    if(now < ANIVERSARIO){
+      diasCounter.textContent = 'Contando los días que faltan ♥';
+      return;
+    }
+    let months = (now.getFullYear() - ANIVERSARIO.getFullYear()) * 12 + (now.getMonth() - ANIVERSARIO.getMonth());
+    let marker = new Date(ANIVERSARIO);
+    marker.setMonth(marker.getMonth() + months);
+    if(marker > now){
+      months--;
+      marker.setMonth(marker.getMonth() - 1);
+    }
+    let remainderMs = now - marker;
+    const days = Math.floor(remainderMs / 86400000);
+    remainderMs -= days * 86400000;
+    const hours = Math.floor(remainderMs / 3600000);
+
+    const parts = [];
+    if(months > 0) parts.push(pluralize(months, 'mes', 'meses'));
+    parts.push(pluralize(days, 'día', 'días'));
+    parts.push(pluralize(hours, 'hora', 'horas'));
+
+    const joined = parts.length > 1
+      ? parts.slice(0, -1).join(', ') + ' y ' + parts[parts.length - 1]
+      : parts[0];
+    diasCounter.textContent = `Llevamos ${joined} juntos ♥`;
+  }
+  updateCounter();
+  setInterval(updateCounter, 60000);
+
+  // ---------- starfield ----------
+  const starsLayer = document.getElementById('stars-layer');
+  const STAR_COUNT = reducedMotion ? 0 : 55;
+  for(let i=0;i<STAR_COUNT;i++){
+    const s = document.createElement('span');
+    const size = (Math.random()*1.6 + 0.6).toFixed(2);
+    s.style.width = size+'px';
+    s.style.height = size+'px';
+    s.style.left = (Math.random()*100)+'%';
+    s.style.top = (Math.random()*100)+'%';
+    s.style.animationDelay = (Math.random()*3.5)+'s';
+    s.style.animationDuration = (2.5+Math.random()*3)+'s';
+    starsLayer.appendChild(s);
+  }
+
+  // ---------- estrellas del fondo de pantalla (versión collage) ----------
+  const wpStarsLayer = document.getElementById('wp-stars-layer');
+  if(wpStarsLayer){
+    for(let i=0;i<60;i++){
+      const s = document.createElement('span');
+      const size = (Math.random()*2 + 0.8).toFixed(2);
+      s.style.width = size+'px';
+      s.style.height = size+'px';
+      s.style.left = (Math.random()*100)+'%';
+      s.style.top = (Math.random()*100)+'%';
+      s.style.opacity = (Math.random()*.6 + .25).toFixed(2);
+      wpStarsLayer.appendChild(s);
+    }
+  }
+
+  // ---------- contador de corazones tocados ----------
+  let heartTapCount = 0;
+  function registerHeartTap(){
+    heartTapCount++;
+  }
+
+  // ---------- corazones al tocar cualquier parte de la pantalla ----------
+  document.addEventListener('pointerdown', e=>{
+    if(reducedMotion) return;
+    if(e.target.closest('.photo-deco')) return; // esos ya cuentan aparte, al soltarse
+    registerHeartTap();
+    const h = document.createElement('div');
+    h.className = 'tap-heart';
+    h.textContent = '♥';
+    h.style.left = e.clientX+'px';
+    h.style.top = e.clientY+'px';
+    document.body.appendChild(h);
+    setTimeout(()=> h.remove(), 850);
+  }, {passive:true});
+
+  // ---------- agitar el celular = confeti ----------
+  let lastMotion = null;
+  let lastShakeAt = 0;
+  function handleShakeMotion(e){
+    const acc = e.accelerationIncludingGravity || e.acceleration;
+    if(!acc || acc.x===null) return;
+    if(lastMotion){
+      const delta = Math.abs(acc.x-lastMotion.x) + Math.abs(acc.y-lastMotion.y) + Math.abs(acc.z-lastMotion.z);
+      const now = Date.now();
+      if(delta > 30 && now - lastShakeAt > 1800){
+        lastShakeAt = now;
+        burstConfetti(window.innerWidth/2, window.innerHeight*0.35);
+      }
+    }
+    lastMotion = {x:acc.x, y:acc.y, z:acc.z};
+  }
+  let shakeEnabled = false;
+  function enableShakeConfetti(){
+    if(shakeEnabled || reducedMotion || typeof DeviceMotionEvent === 'undefined') return;
+    shakeEnabled = true;
+    if(typeof DeviceMotionEvent.requestPermission === 'function'){
+      DeviceMotionEvent.requestPermission().then(state=>{
+        if(state === 'granted') window.addEventListener('devicemotion', handleShakeMotion);
+      }).catch(()=>{});
+    } else {
+      window.addEventListener('devicemotion', handleShakeMotion);
+    }
+  }
+
+  // ---------- ambient hearts ----------
+  let heartsTimer = null;
+  function spawnHeart(){
+    const h = document.createElement('div');
+    h.className='heart-particle';
+    h.textContent = Math.random() > .5 ? '♥' : '✦';
+    h.style.left = (Math.random()*90+5)+'%';
+    h.style.setProperty('--drift', (Math.random()*60-30)+'px');
+    const dur = 6+Math.random()*4;
+    h.style.animationDuration = dur+'s';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(), dur*1000+200);
+  }
+  function startHearts(){
+    if(reducedMotion || heartsTimer) return;
+    heartsTimer = setInterval(spawnHeart, 900);
+  }
+  function stopHearts(){
+    clearInterval(heartsTimer);
+    heartsTimer = null;
+  }
+
+  // ---------- music ----------
+  const bgMusic = document.getElementById('bg-music');
+  const musicToggle = document.getElementById('music-toggle');
+  let musicStarted = false;
+  function tryStartMusic(){
+    if(musicStarted) return;
+    musicStarted = true;
+    bgMusic.volume = 0.5;
+    bgMusic.play().then(()=>{
+      musicToggle.classList.add('playing');
+      musicToggle.setAttribute('aria-pressed','true');
+    }).catch(()=>{ /* el navegador bloqueó el autoplay, puede pulsar el botón */ });
+  }
+  musicToggle.addEventListener('click', ()=>{
+    if(bgMusic.paused){
+      bgMusic.play().then(()=>{
+        musicToggle.classList.add('playing');
+        musicToggle.setAttribute('aria-pressed','true');
+      }).catch(()=>{});
+    } else {
+      bgMusic.pause();
+      musicToggle.classList.remove('playing');
+      musicToggle.setAttribute('aria-pressed','false');
+    }
+  });
+
+  // ---------- modo lectura tranquila ----------
+  const quietToggle = document.getElementById('quiet-toggle');
+  let quietMode = false;
+  quietToggle.addEventListener('click', ()=>{
+    quietMode = !quietMode;
+    document.body.classList.toggle('quiet-mode', quietMode);
+    quietToggle.classList.toggle('on', quietMode);
+    quietToggle.setAttribute('aria-pressed', quietMode ? 'true' : 'false');
+    quietToggle.textContent = quietMode ? '☀️' : '🌙';
+    if(quietMode && !bgMusic.paused){
+      bgMusic.pause();
+      musicToggle.classList.remove('playing');
+      musicToggle.setAttribute('aria-pressed','false');
+    }
+  });
+
+  // ---------- seal-crack sound (synthesized, no file needed) ----------
+  function playSealCrack(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const dur = 0.18;
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<bufferSize;i++){
+        data[i] = (Math.random()*2-1) * Math.pow(1 - i/bufferSize, 3);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'highpass';
+      filter.frequency.value = 900;
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(.22, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(.001, ctx.currentTime+dur);
+      noise.connect(filter).connect(gain).connect(ctx.destination);
+      noise.start();
+      noise.stop(ctx.currentTime+dur+.02);
+    }catch(e){ /* Web Audio no disponible, seguimos sin sonido */ }
+  }
+
+  // sonido "mágico" (tipo destello) para cuando explota la estrella
+  function playStarPop(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const now = ctx.currentTime;
+      // dos notitas subiendo, tipo "ding-ding" alegre y cálido
+      [523.25, 659.25].forEach((freq, i)=>{
+        const start = now + i*0.09;
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const g = ctx.createGain();
+        g.gain.setValueAtTime(0, start);
+        g.gain.linearRampToValueAtTime(.16, start+0.02);
+        g.gain.exponentialRampToValueAtTime(.001, start+0.5);
+        osc.connect(g).connect(ctx.destination);
+        osc.start(start);
+        osc.stop(start+0.55);
+      });
+    }catch(e){ /* Web Audio no disponible, seguimos sin sonido */ }
+  }
+
+  // sonido cálido de "pasar hoja" al cambiar de página
+  function playPageTurn(){
+    try{
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const now = ctx.currentTime;
+      const dur = 0.16;
+      const bufferSize = Math.floor(ctx.sampleRate * dur);
+      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for(let i=0;i<bufferSize;i++){
+        data[i] = (Math.random()*2-1) * Math.pow(1 - i/bufferSize, 2);
+      }
+      const noise = ctx.createBufferSource();
+      noise.buffer = buffer;
+      const filter = ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      filter.frequency.value = 2200;
+      filter.Q.value = 0.7;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(.1, now);
+      g.gain.exponentialRampToValueAtTime(.001, now+dur);
+      noise.connect(filter).connect(g).connect(ctx.destination);
+      noise.start();
+      noise.stop(now+dur+.02);
+    }catch(e){ /* Web Audio no disponible, seguimos sin sonido */ }
+  }
+
+  // vibración corta (si el celular la soporta)
+  function vibrate(pattern){
+    try{ if(navigator.vibrate) navigator.vibrate(pattern); }catch(e){}
+  }
+
+  // ---------- screen switching ----------
+  const screenIntro = document.getElementById('screen-intro');
+  const screenGreeting = document.getElementById('screen-greeting');
+  const screenLetter = document.getElementById('screen-letter');
+  const screenQuiz = document.getElementById('screen-quiz');
+  const envelope = document.getElementById('envelope');
+  const sealGroup = document.querySelector('.seal-group');
+  const closeBtn = document.getElementById('close-letter');
+
+  function goToGreeting(){
+    screenIntro.classList.remove('active');
+    screenGreeting.classList.add('active');
+    startHearts();
+  }
+
+  // ---------- tap-to-ignite star ----------
+  const chargeStar = document.getElementById('charge-star');
+  const flashOverlay = document.getElementById('flash-overlay');
+  let ignited = false;
+
+  function triggerFlash(){
+    flashOverlay.classList.remove('active');
+    void flashOverlay.offsetWidth;
+    flashOverlay.classList.add('active');
+  }
+
+  function triggerIgnite(){
+    if(ignited || chargeStar.classList.contains('exploded')) return;
+    ignited = true;
+    tryStartMusic();
+    enableShakeConfetti();
+    chargeStar.classList.add('igniting');
+    if(reducedMotion){
+      completeIgnite();
+    }
+  }
+
+  function completeIgnite(){
+    chargeStar.classList.remove('igniting');
+    chargeStar.classList.add('exploded');
+    playStarPop();
+    vibrate([25, 40, 60]);
+    triggerFlash();
+    burstConfetti();
+    setTimeout(goToGreeting, reducedMotion ? 100 : 650);
+  }
+
+  chargeStar.addEventListener('animationend', e=>{
+    if(e.animationName === 'ignite') completeIgnite();
+  });
+
+  function burstConfetti(cx, cy, countOverride){
+    if(cx===undefined || cy===undefined){
+      const rect = chargeStar.getBoundingClientRect();
+      cx = rect.left + rect.width/2;
+      cy = rect.top + rect.height/2;
+    }
+    const colors = [
+      getComputedStyle(document.documentElement).getPropertyValue('--gold').trim(),
+      getComputedStyle(document.documentElement).getPropertyValue('--gold-soft').trim(),
+      getComputedStyle(document.documentElement).getPropertyValue('--blush').trim(),
+      getComputedStyle(document.documentElement).getPropertyValue('--red').trim(),
+      getComputedStyle(document.documentElement).getPropertyValue('--teal').trim(),
+      '#ffffff'
+    ];
+    const count = reducedMotion ? 0 : (countOverride !== undefined ? countOverride : 46);
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className = 'streamer';
+      const angle = Math.random()*Math.PI*2;
+      const dist = 90 + Math.random()*220;
+      const tx = Math.cos(angle)*dist;
+      const ty = Math.sin(angle)*dist + 60;
+      const rot = (Math.random()*720-360)+'deg';
+      const w = 5 + Math.random()*5;
+      const h = 12 + Math.random()*14;
+      el.style.left = cx+'px';
+      el.style.top = cy+'px';
+      el.style.width = w+'px';
+      el.style.height = h+'px';
+      el.style.background = colors[Math.floor(Math.random()*colors.length)];
+      el.style.setProperty('--tx', tx+'px');
+      el.style.setProperty('--ty', ty+'px');
+      el.style.setProperty('--rot', rot);
+      const dur = 900 + Math.random()*500;
+      el.style.animationDuration = dur+'ms';
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), dur+150);
+    }
+  }
+
+  // ---------- explosión de corazones (respuesta correcta del minijuego) ----------
+  function burstHearts(cx, cy, count){
+    if(reducedMotion) return;
+    if(count === undefined) count = 26;
+    for(let i=0;i<count;i++){
+      const el = document.createElement('div');
+      el.className = 'streamer';
+      el.textContent = '♥';
+      el.style.background = 'none';
+      el.style.color = Math.random() < 0.5 ? 'var(--red)' : 'var(--blush)';
+      el.style.fontSize = (0.9 + Math.random()*0.9)+'rem';
+      el.style.lineHeight = '1';
+      const angle = Math.random()*Math.PI*2;
+      const dist = 70 + Math.random()*170;
+      const tx = Math.cos(angle)*dist;
+      const ty = Math.sin(angle)*dist - 30;
+      const rot = (Math.random()*360-180)+'deg';
+      el.style.left = cx+'px';
+      el.style.top = cy+'px';
+      el.style.setProperty('--tx', tx+'px');
+      el.style.setProperty('--ty', ty+'px');
+      el.style.setProperty('--rot', rot);
+      const dur = 800 + Math.random()*500;
+      el.style.animationDuration = dur+'ms';
+      document.body.appendChild(el);
+      setTimeout(()=>el.remove(), dur+150);
+    }
+  }
+
+  chargeStar.addEventListener('click', triggerIgnite);
+  chargeStar.addEventListener('keydown', e=>{
+    if((e.key===' '||e.key==='Enter') && !e.repeat){ e.preventDefault(); triggerIgnite(); }
+  });
+
+  // ---------- envelope: pull seal → open flap → reveal letter ----------
+  function openEnvelope(){
+    if(envelope.classList.contains('unsealed')) return;
+    envelope.classList.add('unsealed');
+    sealGroup.classList.add('pulled');
+    playSealCrack();
+    const sealDelay = reducedMotion ? 50 : 550;
+    setTimeout(()=> envelope.classList.add('open'), sealDelay);
+    setTimeout(()=> envelope.classList.add('rise'), sealDelay + (reducedMotion ? 50 : 900));
+    setTimeout(()=>{
+      screenGreeting.classList.remove('active');
+      screenLetter.classList.add('active');
+      showPage(0);
+    }, sealDelay + (reducedMotion ? 100 : 1500));
+  }
+
+  function closeLetter(){
+    screenLetter.classList.remove('active');
+    envelope.classList.remove('open','rise','unsealed');
+    sealGroup.classList.remove('pulled');
+    screenGreeting.classList.add('active');
+  }
+
+  ['click','keydown'].forEach(evt=>{
+    envelope.addEventListener(evt, e=>{
+      if(evt==='keydown' && e.key!=='Enter' && e.key!==' ') return;
+      if(evt==='keydown') e.preventDefault();
+      openEnvelope();
+    });
+    sealGroup.addEventListener(evt, e=>{
+      if(evt==='keydown' && e.key!=='Enter' && e.key!==' ') return;
+      if(evt==='keydown') e.preventDefault();
+      openEnvelope();
+    });
+  });
+
+  closeBtn.addEventListener('click', closeLetter);
+
+  // ---------- book pagination ----------
+  const pages = document.querySelectorAll('#pages-viewport .page');
+  const pageDots = document.querySelectorAll('#page-dots button');
+  const prevPageBtn = document.getElementById('prev-page');
+  const nextPageBtn = document.getElementById('next-page');
+  const firmaText = document.getElementById('firma-text');
+  const dawnOverlay = document.getElementById('dawn-overlay');
+  const dawnPageIndex = Array.from(pages).findIndex(p => p.hasAttribute('data-dawn'));
+  let currentPage = 0;
+  let reachedLetterEnd = false;
+
+  function showPage(i){
+    currentPage = Math.max(0, Math.min(pages.length-1, i));
+    pages.forEach((p,idx)=> p.classList.toggle('active', idx===currentPage));
+    pageDots.forEach((d,idx)=> d.classList.toggle('active', idx===currentPage));
+    prevPageBtn.disabled = currentPage===0;
+    nextPageBtn.disabled = currentPage===pages.length-1;
+    const progressFill = document.getElementById('reading-progress-fill');
+    if(progressFill){
+      const pct = pages.length > 1 ? (currentPage/(pages.length-1))*100 : 100;
+      progressFill.style.width = pct+'%';
+    }
+    const letterCard = document.querySelector('.letter-card');
+    if(letterCard) letterCard.scrollTop = 0;
+    const heartSummary = document.getElementById('heart-tap-summary');
+    if(heartSummary && currentPage === pages.length - 1){
+      heartSummary.textContent = heartTapCount > 0
+        ? `Tocaste ${heartTapCount} corazones en el camino ♥`
+        : '';
+      if(!reachedLetterEnd){
+        reachedLetterEnd = true;
+        burstConfetti(window.innerWidth/2, window.innerHeight*0.3, 60);
+      }
+    }
+    if(currentPage === 1 && firmaText){
+      firmaText.classList.remove('write','blink');
+      void firmaText.offsetWidth;
+      if(!reducedMotion) firmaText.classList.add('write','blink');
+      else firmaText.style.width = '100%';
+    }
+    if(dawnOverlay){
+      dawnOverlay.classList.toggle('active', dawnPageIndex >= 0 && currentPage >= dawnPageIndex);
+    }
+  }
+  prevPageBtn.addEventListener('click', e=>{
+    const r = e.currentTarget.getBoundingClientRect();
+    burstHearts(r.left + r.width/2, r.top + r.height/2, 8);
+    playPageTurn();
+    showPage(currentPage-1);
+  });
+  nextPageBtn.addEventListener('click', e=>{
+    const r = e.currentTarget.getBoundingClientRect();
+    burstHearts(r.left + r.width/2, r.top + r.height/2, 8);
+    playPageTurn();
+    showPage(currentPage+1);
+  });
+  pageDots.forEach((d,idx)=> d.addEventListener('click', ()=>{ playPageTurn(); showPage(idx); }));
+
+  // ---------- corazoncitos repartidos sobre cada foto ----------
+  function decoratePhotos(){
+    document.querySelectorAll('.polaroid, .carousel-slide').forEach(container=>{
+      const count = 14;
+      for(let i=0;i<count;i++){
+        const d = document.createElement('button');
+        d.className = 'photo-deco';
+        d.type = 'button';
+        d.setAttribute('aria-label', 'Corazón');
+        d.textContent = '♥';
+        // las reparte en un anillo alrededor del borde de la foto, bien separadas
+        const angle = (i / count) * Math.PI * 2 + (Math.random()*0.22 - 0.11);
+        const rx = 44 + Math.random()*11; // radio horizontal (%)
+        const ry = 44 + Math.random()*11; // radio vertical (%)
+        const top = 50 + Math.sin(angle) * ry;
+        const left = 50 + Math.cos(angle) * rx;
+        d.style.top = top+'%';
+        d.style.left = left+'%';
+        d.style.setProperty('--deco-rot', Math.round(Math.random()*50-25)+'deg');
+        d.style.fontSize = (0.6+Math.random()*0.35)+'rem';
+        d.style.color = Math.random() < 0.55 ? 'var(--red)' : 'var(--blush)';
+        d.style.opacity = (0.8+Math.random()*0.2).toFixed(2);
+        d.addEventListener('pointerdown', e=>{
+          e.stopPropagation();
+          if(d.classList.contains('tapped')) return;
+          d.classList.add('tapped');
+          registerHeartTap();
+        });
+        container.appendChild(d);
+      }
+    });
+  }
+  decoratePhotos();
+
+  // ---------- photo carousel ----------
+  const carTrack = document.getElementById('carousel-track');
+  const carDots = document.querySelectorAll('#carousel-dots button');
+  const carCount = carTrack.children.length;
+  let carIndex = 0;
+  function showCarousel(i){
+    carIndex = (i + carCount) % carCount;
+    carTrack.style.transform = 'translateX(-' + (carIndex*100) + '%)';
+    carDots.forEach((d,idx)=> d.classList.toggle('active', idx===carIndex));
+  }
+  document.getElementById('car-prev').addEventListener('click', ()=> showCarousel(carIndex-1));
+  document.getElementById('car-next').addEventListener('click', ()=> showCarousel(carIndex+1));
+  carDots.forEach((d,idx)=> d.addEventListener('click', ()=> showCarousel(idx)));
+
+  // ---------- mini quiz ----------
+  const quizQs = document.querySelectorAll('.quiz-q');
+  const quizFinal = document.querySelector('.quiz-final');
+  let quizIndex = 0;
+
+  // mezcla el orden de las opciones para que la correcta no sea siempre la primera
+  document.querySelectorAll('.quiz-options').forEach(group=>{
+    const opts = Array.from(group.children);
+    for(let i = opts.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [opts[i], opts[j]] = [opts[j], opts[i]];
+    }
+    opts.forEach(opt => group.appendChild(opt));
+  });
+
+  function showQuiz(i){
+    quizIndex = i;
+    quizQs.forEach((q,idx)=> q.classList.toggle('active', idx===quizIndex));
+    const done = quizIndex >= quizQs.length;
+    quizFinal.classList.toggle('active', done);
+    if(done){
+      triggerFlash();
+      burstConfetti(window.innerWidth/2, window.innerHeight*0.35);
+    }
+  }
+  // baraja las opciones de cada pregunta para que la correcta no quede siempre primera
+  document.querySelectorAll('.quiz-options').forEach(group=>{
+    const opts = Array.from(group.children);
+    for(let i=opts.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [opts[i],opts[j]] = [opts[j],opts[i]];
+    }
+    opts.forEach(o=> group.appendChild(o));
+  });
+
+  document.querySelectorAll('.quiz-opt').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if(btn.dataset.correct === 'true'){
+        btn.classList.add('correct-flash');
+        const rect = btn.getBoundingClientRect();
+        burstHearts(rect.left + rect.width/2, rect.top + rect.height/2);
+        setTimeout(()=>{
+          btn.classList.remove('correct-flash');
+          showQuiz(quizIndex+1);
+        }, 650);
+      } else {
+        btn.classList.add('wrong-flash');
+        setTimeout(()=> btn.classList.remove('wrong-flash'), 450);
+        setTimeout(()=> showQuiz(0), 700);
+      }
+    });
+  });
+
+  function goToQuiz(){
+    screenLetter.classList.remove('active');
+    screenQuiz.classList.add('active');
+    showQuiz(0);
+  }
+  document.getElementById('extra-surprise').addEventListener('click', goToQuiz);
+
+  // ---------- replay ----------
+  function resetAll(){
+    chargeStar.classList.remove('igniting','exploded');
+    ignited = false;
+    envelope.classList.remove('open','rise','unsealed');
+    sealGroup.classList.remove('pulled');
+    screenQuiz.classList.remove('active');
+    screenLetter.classList.remove('active');
+    screenGreeting.classList.remove('active');
+    screenIntro.classList.add('active');
+    if(firmaText) firmaText.classList.remove('write','blink');
+    reasonIndex = -1;
+    reasonText.textContent = 'Toca el botón para ver la primera razón ♥';
+    reasonBtn.textContent = 'Otra razón más →';
+    document.querySelectorAll('.coupon.flipped').forEach(c=> c.classList.remove('flipped'));
+    showPage(0);
+    showQuiz(0);
+  }
+  document.getElementById('replay-btn').addEventListener('click', resetAll);
+
+  // ---------- estrella fugaz: pide un deseo ----------
+  const wishToast = document.getElementById('wish-toast');
+  const wishToastText = document.getElementById('wish-toast-text');
+  let wishToastTimer = null;
+
+  function showWishToast(text, holdMs){
+    clearTimeout(wishToastTimer);
+    wishToastText.textContent = text;
+    wishToast.classList.add('active');
+    if(holdMs){
+      wishToastTimer = setTimeout(()=> wishToast.classList.remove('active'), holdMs);
+    }
+  }
+
+  function spawnShootingStar(){
+    if(reducedMotion) return;
+    const star = document.createElement('div');
+    star.className = 'shooting-star';
+    const startX = 55 + Math.random()*40; // % del ancho
+    const startY = 6 + Math.random()*20;  // % del alto
+    const dist = 55 + Math.random()*25;   // vw de recorrido
+    star.style.left = startX + 'vw';
+    star.style.top = startY + 'vh';
+    star.style.setProperty('--shoot-tx', '-' + dist + 'vw');
+    star.style.setProperty('--shoot-ty', (dist*0.55) + 'vh');
+    star.style.setProperty('--shoot-angle', '25deg');
+    star.style.setProperty('--shoot-dur', (1.1 + Math.random()*0.3) + 's');
+    let caught = false;
+    star.addEventListener('pointerdown', e=>{
+      e.stopPropagation();
+      if(caught) return;
+      caught = true;
+      star.style.animationPlayState = 'paused';
+      star.remove();
+      showWishToast('✨ Pide un deseo ♥', null);
+      setTimeout(()=>{
+        showWishToast('Tu deseo ya está en camino... se hará realidad ♥', 4500);
+      }, 10000);
+    });
+    star.addEventListener('animationend', ()=> star.remove());
+    document.body.appendChild(star);
+  }
+
+  function scheduleShootingStar(){
+    const delay = 22000 + Math.random()*20000; // cada 22-42s aprox
+    setTimeout(()=>{
+      spawnShootingStar();
+      scheduleShootingStar();
+    }, delay);
+  }
+  if(!reducedMotion) scheduleShootingStar();
+
+  // ---------- estrella escondida + carta secreta ----------
+  const hiddenStar = document.getElementById('hidden-star');
+  const secretOverlay = document.getElementById('secret-overlay');
+  const closeSecret = document.getElementById('close-secret');
+  // posición fija dentro del cielo (arriba de la pantalla); muévela si quieres
+  hiddenStar.style.left = '78%';
+  hiddenStar.style.top = '12%';
+  hiddenStar.addEventListener('click', ()=>{
+    hiddenStar.classList.add('found');
+    secretOverlay.classList.add('active');
+  });
+  closeSecret.addEventListener('click', ()=> secretOverlay.classList.remove('active'));
+  secretOverlay.addEventListener('click', e=>{
+    if(e.target === secretOverlay) secretOverlay.classList.remove('active');
+  });
+
+  // ---------- fotos secretas ocultas tras la estrella ----------
+  const secretStack = document.getElementById('secret-photos-stack');
+  const secretVeil = document.getElementById('secret-photos-veil');
+  const secretDownloadBtn = document.getElementById('secret-photos-download');
+  // orden actual de las fotos, de adelante hacia atrás
+  const secretOrder = Array.from(secretStack.querySelectorAll('.secret-photo'));
+  let secretRevealed = false;
+
+  function stackSecretPhotos(){
+    secretOrder.forEach((img,i)=>{ img.style.zIndex = secretOrder.length - i; });
+  }
+  stackSecretPhotos();
+
+  function revealSecretPhotos(){
+    if(secretRevealed) return;
+    secretRevealed = true;
+    secretStack.classList.add('revealed');
+    secretVeil.classList.add('hidden');
+  }
+
+  function advanceSecretPhoto(){
+    const front = secretOrder[0];
+    front.classList.add('leaving');
+    setTimeout(()=>{
+      secretOrder.push(secretOrder.shift());
+      front.classList.add('no-transition');
+      front.style.transform = '';
+      front.style.opacity = '';
+      void front.offsetWidth; // fuerza el reflow antes de quitar la transición
+      front.classList.remove('leaving');
+      stackSecretPhotos();
+      requestAnimationFrame(()=> front.classList.remove('no-transition'));
+    }, 480);
+  }
+
+  secretVeil.addEventListener('click', e=>{
+    e.stopPropagation();
+    revealSecretPhotos();
+  });
+  secretStack.addEventListener('click', ()=>{
+    if(!secretRevealed){ revealSecretPhotos(); return; }
+    advanceSecretPhoto();
+  });
+  secretDownloadBtn.addEventListener('click', ()=>{
+    const front = secretOrder[0];
+    const link = document.createElement('a');
+    link.href = front.src;
+    link.download = front.src.split('/').pop();
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+
+  // ---------- predicción del amor ----------
+  const PREDICTIONS = [
+    'El destino dice que este es apenas el primer capítulo de una historia muy larga.',
+    'Las estrellas aseguran que van a envejecer juntos, tomados de la mano.',
+    'Está escrito: cada año que pase, se van a amar un poco más que el anterior.',
+    'El universo conspira para que sigan encontrándose, vida tras vida.',
+    'Pronto vivirán una aventura juntos que van a recordar para siempre.',
+    'El amor que sienten hoy es solo el comienzo de algo mucho más grande.',
+    'Está predicho: van a construir muchos recuerdos hermosos, uno a la vez.',
+    'Las señales apuntan a que esta es la persona correcta, en el momento correcto.',
+    'El destino asegura que ningún día a su lado será un día cualquiera.',
+    'Todo indica que este amor está hecho para durar toda la vida.'
+  ];
+  const predictionOverlay = document.getElementById('prediction-overlay');
+  const predictionText = document.getElementById('prediction-text');
+  const closePrediction = document.getElementById('close-prediction');
+  const predictionAgainBtn = document.getElementById('prediction-again');
+
+  function showPrediction(){
+    predictionText.textContent = PREDICTIONS[Math.floor(Math.random()*PREDICTIONS.length)];
+  }
+  document.getElementById('prediction-btn').addEventListener('click', ()=>{
+    showPrediction();
+    predictionOverlay.classList.add('active');
+  });
+  predictionAgainBtn.addEventListener('click', showPrediction);
+  closePrediction.addEventListener('click', ()=> predictionOverlay.classList.remove('active'));
+  predictionOverlay.addEventListener('click', e=>{
+    if(e.target === predictionOverlay) predictionOverlay.classList.remove('active');
+  });
+
+  // ---------- certificado de amor ----------
+  const certificateOverlay = document.getElementById('certificate-overlay');
+  const closeCertificate = document.getElementById('close-certificate');
+  document.getElementById('certificate-btn').addEventListener('click', ()=>{
+    const dateEl = document.getElementById('cert-date');
+    dateEl.textContent = new Date().toLocaleDateString('es-CL', { day:'numeric', month:'long', year:'numeric' });
+    certificateOverlay.classList.add('active');
+  });
+  closeCertificate.addEventListener('click', ()=> certificateOverlay.classList.remove('active'));
+  certificateOverlay.addEventListener('click', e=>{
+    if(e.target === certificateOverlay) certificateOverlay.classList.remove('active');
+  });
+  document.getElementById('certificate-download-btn').addEventListener('click', ()=>{
+    if(typeof html2canvas === 'undefined'){
+      alert('No se pudo cargar la herramienta para generar la imagen. Revisa tu conexión a internet e inténtalo de nuevo.');
+      return;
+    }
+    const certInner = document.getElementById('certificate-inner');
+    fontsReady.then(()=> new Promise(r=>setTimeout(r,80))).then(()=> html2canvas(certInner, {
+      backgroundColor:null, useCORS:true, allowTaint:false, scale:3
+    })).then(canvas=>{
+      deliverImage(canvas.toDataURL('image/png'), 'certificado-de-amor.png');
+    }).catch(err=>{
+      alert('No se pudo generar el certificado. Intenta de nuevo en un rato.\n\nDetalle: ' + (err && err.message ? err.message : err));
+    });
+  });
+
+  // ---------- mensaje de voz ----------
+  const voiceAudio = document.getElementById('voice-audio');
+  const voiceBtn = document.getElementById('voice-btn');
+  voiceBtn.addEventListener('click', ()=>{
+    if(voiceAudio.paused){
+      voiceAudio.play().then(()=>{
+        voiceBtn.textContent = '⏸ Pausar';
+        voiceBtn.classList.add('playing');
+      }).catch(()=>{ voiceBtn.textContent = '⚠️ Agrega mensaje-voz.mp3'; });
+    } else {
+      voiceAudio.pause();
+    }
+  });
+  voiceAudio.addEventListener('ended', ()=>{
+    voiceBtn.textContent = '🎙️ Escúchame';
+    voiceBtn.classList.remove('playing');
+  });
+  voiceAudio.addEventListener('pause', ()=>{
+    if(!voiceAudio.ended){
+      voiceBtn.textContent = '🎙️ Escúchame';
+      voiceBtn.classList.remove('playing');
+    }
+  });
+
+  // ---------- guardar como recuerdo ----------
+  // ---------- entrega de imágenes generadas (guardar / wallpaper) ----------
+  // se muestra directo en la misma pantalla (sin ventanas nuevas), porque
+  // abrir un archivo local con file:// suele bloquear las pestañas emergentes
+  const imgPreviewOverlay = document.getElementById('image-preview-overlay');
+  const imgPreviewImg = document.getElementById('image-preview-img');
+  const imgPreviewDownload = document.getElementById('image-preview-download');
+  const imgPreviewClose = document.getElementById('image-preview-close');
+  let currentPreviewName = 'imagen.png';
+
+  function deliverImage(dataUrl, filename){
+    currentPreviewName = filename;
+    imgPreviewImg.src = dataUrl;
+    imgPreviewOverlay.classList.add('active');
+    // intento de descarga automática además de mostrarla (por si funciona)
+    try{
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = dataUrl;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }catch(e){}
+  }
+  imgPreviewDownload.addEventListener('click', ()=>{
+    const link = document.createElement('a');
+    link.download = currentPreviewName;
+    link.href = imgPreviewImg.src;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+  imgPreviewClose.addEventListener('click', ()=> imgPreviewOverlay.classList.remove('active'));
+  imgPreviewOverlay.addEventListener('click', e=>{
+    if(e.target === imgPreviewOverlay) imgPreviewOverlay.classList.remove('active');
+  });
+
+  // evita capturar antes de que la tipografía cursiva termine de cargar
+  const fontsReady = document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve();
+  // si alguna foto del collage aún no existe, la ocultamos en vez de romper la captura
+  document.querySelectorAll('.wp-collage img, .wp-cats-img').forEach(img=>{
+    img.addEventListener('error', ()=>{ img.style.visibility = 'hidden'; });
+  });
+
+  function generateWallpaper(templateId, filename){
+    if(typeof html2canvas === 'undefined'){
+      alert('No se pudo cargar la herramienta para generar el fondo de pantalla. Revisa tu conexión a internet e inténtalo de nuevo.');
+      return;
+    }
+    const wpTemplate = document.getElementById(templateId);
+    wpTemplate.classList.add('capturing');
+    fontsReady.then(()=> new Promise(r=>setTimeout(r,120))).then(()=> html2canvas(wpTemplate, {
+      backgroundColor:null, useCORS:true, allowTaint:false, scale:3
+    })).then(canvas=>{
+      wpTemplate.classList.remove('capturing');
+      deliverImage(canvas.toDataURL('image/png'), filename);
+    }).catch(err=>{
+      wpTemplate.classList.remove('capturing');
+      alert('No se pudo generar el fondo de pantalla. Intenta de nuevo en un rato.\n\nDetalle: ' + (err && err.message ? err.message : err));
+    });
+  }
+  document.getElementById('wallpaper-sunrise-btn').addEventListener('click', ()=>{
+    generateWallpaper('wallpaper-sunrise', 'fondo-fernanda-amanecer.png');
+  });
+  document.getElementById('wallpaper-collage-btn').addEventListener('click', ()=>{
+    generateWallpaper('wallpaper-collage', 'fondo-fernanda-collage.png');
+  });
+
+  // ---------- calcular cantidad de amor ----------
+  const loveCalcOverlay = document.getElementById('love-calc-overlay');
+  const loveCalcBtn = document.getElementById('love-calc-btn');
+  const closeLoveCalc = document.getElementById('close-love-calc');
+  const lcSteps = document.querySelectorAll('.lc-step');
+  const lcHeartsEl = document.getElementById('lc-hearts');
+  const lcTimeEl = document.getElementById('lc-time');
+  const lcNumberEl = document.getElementById('lc-number');
+  const lcFormulaEl = document.getElementById('lc-formula');
+
+  function showLcStep(idx){
+    lcSteps.forEach((s,i)=> s.classList.toggle('active', i===idx));
+  }
+
+  function playLoveCalculation(){
+    lcNumberEl.classList.remove('infinity');
+    lcNumberEl.textContent = '0';
+
+    // paso 1: los datos base (días, horas, minutos y segundos juntos)
+    const now = new Date();
+    const totalSeconds = Math.max(1, Math.floor((now - ANIVERSARIO) / 1000));
+    const days = Math.floor(totalSeconds / 86400);
+    const hours = Math.floor((totalSeconds % 86400) / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    const heartsUsed = Math.max(1, heartTapCount);
+
+    lcHeartsEl.textContent = heartsUsed.toLocaleString('es-CL');
+    lcTimeEl.textContent = `${days} días, ${hours} horas, ${minutes} minutos y ${seconds} segundos`;
+    lcFormulaEl.textContent = `(♥ ${heartsUsed} × ${days} días × ${hours} horas × ${minutes} minutos × ${seconds} segundos) ÷ 0`;
+    showLcStep(0);
+    loveCalcOverlay.classList.add('active');
+    loveCalcOverlay.dataset.hearts = heartsUsed;
+  }
+
+  function runLoveCountUp(){
+    showLcStep(2);
+    const heartsUsed = Number(loveCalcOverlay.dataset.hearts) || 1;
+    if(reducedMotion){
+      lcNumberEl.textContent = '∞';
+      lcNumberEl.classList.add('infinity');
+      return;
+    }
+    let value = heartsUsed * 7 + 3;
+    const countUp = setInterval(()=>{
+      value = Math.floor(value * (1.18 + Math.random()*0.22)) + Math.ceil(Math.random()*9);
+      lcNumberEl.textContent = value.toLocaleString('es-CL');
+      if(String(value).length >= 10){
+        clearInterval(countUp);
+        lcNumberEl.textContent = '∞';
+        lcNumberEl.classList.add('infinity');
+      }
+    }, 45);
+  }
+
+  document.getElementById('lc-next-1').addEventListener('click', ()=> showLcStep(1));
+  document.getElementById('lc-next-2').addEventListener('click', runLoveCountUp);
+
+  loveCalcBtn.addEventListener('click', playLoveCalculation);
+  closeLoveCalc.addEventListener('click', ()=>{
+    loveCalcOverlay.classList.remove('active');
+  });
+  loveCalcOverlay.addEventListener('click', e=>{
+    if(e.target === loveCalcOverlay){
+      loveCalcOverlay.classList.remove('active');
+    }
+  });
+
+  // ---------- vales canjeables ----------
+  document.querySelectorAll('.coupon').forEach(coupon=>{
+    const toggle = ()=> coupon.classList.toggle('flipped');
+    coupon.addEventListener('click', toggle);
+    coupon.addEventListener('keydown', e=>{
+      if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggle(); }
+    });
+  });
+
+  // ---------- lista de razones ----------
+  // ✏️ agrega, borra o cambia las frases que quieras aquí
+  const REASONS = [
+    'Porque tu sonrisa ilumina cualquier día gris.',
+    'Porque tu risa es mi sonido favorito en el mundo.',
+    'Porque la forma en que me miras me hace sentir el hombre más afortunado.',
+    'Porque eres hermosa de una forma que no necesita esfuerzo.',
+    'Porque todo en ti, tal cual eres, me enamora un poco más cada día.',
+    'Porque tu voz cuando hablamos por llamada es mi lugar seguro.',
+    'Porque tienes un humor que nadie más entiende como yo.',
+    'Porque hasta cuando te enojas conmigo, encuentro la forma de amarte más.',
+    'Porque tus abrazos son el único lugar donde el tiempo se detiene.',
+    'Porque tus besos siempre se sienten como la primera vez.',
+    'Porque cuando me tocas despacio, todo lo demás deja de importar.',
+    'Porque tienes una forma única de hacerme sentir en casa.',
+    'Porque me haces reír incluso en mis peores días.',
+    'Porque tu paciencia conmigo no tiene límite.',
+    'Porque cada pequeño detalle tuyo me sorprende.',
+    'Porque contigo hasta lo simple se siente especial.',
+    'Porque tu forma de hablar, tan tuya, me cautivó desde el primer día.',
+    'Porque cuando te emocionas contando algo, no puedo dejar de mirarte.',
+    'Porque sabes calmarme sin decir una palabra.',
+    'Porque tu forma de cuidarme, sin que lo pida, dice todo lo que sientes.',
+    'Porque tienes la mirada más honesta que he conocido.',
+    'Porque me haces querer ser mejor persona todos los días.',
+    'Porque disfrutas las cosas simples y eso me enamora.',
+    'Porque tu terquedad, aunque a veces me saque canas verdes, es parte de lo que amo de ti.',
+    'Porque sabes perdonar, incluso cuando yo la cago.',
+    'Porque tus manos encajan perfecto con las mías.',
+    'Porque tu cercanía se siente como hogar.',
+    'Porque nunca dejas de sorprenderme.',
+    'Porque tu forma de amar es generosa, incluso cuando no te das cuenta.',
+    'Porque contigo puedo ser completamente yo mismo.',
+    'Porque tu forma de ser se me quedó grabada desde el primer abrazo.',
+    'Porque sabes escuchar de verdad, no solo esperar tu turno para hablar.',
+    'Porque cuando te ríes fuerte y sin filtro, es mi momento favorito del día.',
+    'Porque me haces sentir elegido, todos los días.',
+    'Porque tienes una fuerza tranquila que admiro profundamente.',
+    'Porque tu forma de bailar sola cuando crees que nadie te ve, me enamora en secreto.',
+    'Porque cada "te amo" tuyo se siente distinto, y siempre nuevo.',
+    'Porque me enseñaste a amar de una forma que no sabía que existía.',
+    'Porque tu presencia, aunque estés en silencio, me tranquiliza.',
+    'Porque sabes exactamente cuándo abrazarme sin que te lo pida.',
+    'Porque tu forma de mirarme cuando crees que no me doy cuenta, me derrite.',
+    'Porque celebras mis logros como si fueran tuyos.',
+    'Porque me haces sentir seguro incluso en los días difíciles.',
+    'Porque tu curiosidad por la vida me inspira.',
+    'Porque tienes una manera de hacerme sentir importante sin esfuerzo.',
+    'Porque tu forma de defender lo que piensas me hace admirarte más.',
+    'Porque tu forma de disculparte, aunque a veces cueste, muestra lo grande que eres.',
+    'Porque cada beso tuyo se siente como una promesa.',
+    'Porque me eliges cada día, y yo también te elijo a ti.',
+    'Porque tu forma de preocuparte por los demás me demuestra lo grande que es tu corazón.',
+    'Porque me haces sentir que el amor de verdad sí existe.',
+    'Porque hasta tus mañas se volvieron mis favoritas.',
+    'Porque contigo, cada plan simple se convierte en mi momento favorito del día.',
+    'Porque tu cuerpo, tu voz, tu forma de ser, todo en ti se siente como mío desde el primer día.',
+    'Porque no me imagino la vida sin tu risa, tus enojos, tus abrazos... sin ti.',
+    'Porque simplemente, eres todo lo que no sabía que necesitaba.'
+  ];
+  const reasonText = document.getElementById('reason-text');
+  const reasonBtn = document.getElementById('reason-btn');
+  let reasonIndex = -1;
+  reasonBtn.addEventListener('click', ()=>{
+    reasonIndex = (reasonIndex + 1) % REASONS.length;
+    reasonText.textContent = REASONS[reasonIndex];
+    reasonText.classList.remove('pop');
+    void reasonText.offsetWidth;
+    reasonText.classList.add('pop');
+    reasonBtn.textContent = reasonIndex === REASONS.length - 1
+      ? '↺ Empezar de nuevo'
+      : 'Otra razón más →';
+  });
+
+})();
+</script>
+
+</body>
+</html>
