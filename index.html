@@ -2592,22 +2592,25 @@
   });
 
   function generateWallpaper(templateId, filename){
-    if(typeof html2canvas === 'undefined'){
-      alert('No se pudo cargar la herramienta para generar el fondo de pantalla. Revisa tu conexión a internet e inténtalo de nuevo.');
-      return;
-    }
-    const wpTemplate = document.getElementById(templateId);
-    wpTemplate.classList.add('capturing');
-    fontsReady.then(()=> new Promise(r=>setTimeout(r,120))).then(()=> html2canvas(wpTemplate, {
-      backgroundColor:null, useCORS:true, allowTaint:false, scale:3
-    })).then(canvas=>{
-      wpTemplate.classList.remove('capturing');
-      deliverImage(canvas.toDataURL('image/png'), filename);
-    }).catch(err=>{
-      wpTemplate.classList.remove('capturing');
-      alert('No se pudo generar el fondo de pantalla. Intenta de nuevo en un rato.\n\nDetalle: ' + (err && err.message ? err.message : err));
-    });
+  if(typeof html2canvas === 'undefined'){
+    alert('...');
+    return;
   }
+  const wpTemplate = document.getElementById(templateId);
+  fontsReady.then(()=> new Promise(r=>setTimeout(r,120))).then(()=> html2canvas(wpTemplate, {
+    backgroundColor:null, useCORS:true, allowTaint:false, scale:3,
+    onclone:(clonedDoc)=>{
+      const clonedEl = clonedDoc.getElementById(templateId);
+      if(clonedEl){
+        clonedEl.style.visibility = 'visible';
+      }
+    }
+  })).then(canvas=>{
+    deliverImage(canvas.toDataURL('image/png'), filename);
+  }).catch(err=>{
+    alert('...');
+  });
+}
   document.getElementById('wallpaper-sunrise-btn').addEventListener('click', ()=>{
     generateWallpaper('wallpaper-sunrise', 'fondo-fernanda-amanecer.png');
   });
