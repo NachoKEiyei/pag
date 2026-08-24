@@ -458,17 +458,18 @@
 
   /* ---- wallpaper template (offscreen, used only for capture) ---- */
   .wallpaper-template{
-    position:fixed;left:-9999px;top:0;
+    position:fixed;left:0;top:0;
     width:390px;height:844px;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
     text-align:center;padding:2.4rem;box-sizing:border-box;overflow:hidden;
-  }
-  .wallpaper-template.bg-sunrise{
-    background:var(--paper);
-  }
-  .wallpaper-template.bg-stars{
-    background:linear-gradient(180deg,var(--bg-deep-2),var(--bg-deep));
-  }
+    visibility:hidden;pointer-events:none;
+}
+.wallpaper-template.bg-sunrise{
+  background:var(--paper);
+}
+.wallpaper-template.bg-stars{
+  background:linear-gradient(180deg,var(--bg-deep-2),var(--bg-deep));
+}
   .wallpaper-template.capturing{
     left:50%;top:50%;transform:translate(-50%,-50%);
     z-index:80;box-shadow:0 20px 60px rgba(0,0,0,.6);
